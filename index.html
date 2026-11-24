@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quanten-Greifarm Arcade</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap');
+
+    body {
+      background-color: #0d0f18;
+      font-family: 'Rajdhani', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .pixel-font {
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    .arcade-frame {
+      border: 12px solid #2a2d43;
+      border-radius: 24px;
+      box-shadow: 0 0 35px rgba(124, 58, 237, 0.35), inset 0 0 15px rgba(0,0,0,0.8);
+    }
+
+    .neon-text-purple {
+      text-shadow: 0 0 8px rgba(168, 85, 247, 0.8), 0 0 15px rgba(168, 85, 247, 0.4);
+    }
+
+    .neon-text-green {
+      text-shadow: 0 0 8px rgba(34, 197, 94, 0.8), 0 0 15px rgba(34, 197, 94, 0.4);
+    }
+
+    .neon-border-cyan {
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+    }
+
+    /* Custom scrollbar for shop/collection */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #111827;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-white flex flex-col items-center justify-center p-2 sm:p-4 bg-slate-950 overflow-x-hidden">
+
+  <!-- Haupt-Container -->
+  <div class="w-full max-w-4xl flex flex-col items-center">
+    
+    <!-- Arcade Header -->
+    <header class="w-full flex items-center justify-between mb-3 px-4 py-2 bg-slate-900 border-2 border-purple-600/50 rounded-xl shadow-lg">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center text-2xl shadow-md">🕹️</div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-wider text-purple-400 neon-text-purple">QUANTEN-GREIFARM</h1>
+          <p class="text-xs text-slate-400">Das Arcade-Spiel mit dem Physik-Kniff</p>
+        </div>
+      </div>
+      
+      <!-- Münzen & Punkte -->
+      <div class="flex items-center gap-4">
+        <div class="bg-slate-800 border border-amber-500/40 px-3 py-1.5 rounded-lg flex items-center gap-2">
+          <span class="text-amber-400 text-lg">🪙</span>
+          <span id="coin-display" class="pixel-font text-amber-300 text-sm">100</span>
+        </div>
+        <button id="btn-shop" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 border border-indigo-400">
+          🛒 SHOP
+        </button>
+      </div>
+    </header>
+
+    <!-- Haupt-Spielfeld / Automat -->
+    <div class="w-full grid grid-cols-1 md:grid-cols-12 gap-4">
+      
+      <!-- Linke Spalte: Automat (Canvas & Controls) -->
+      <div class="md:col-span-8 flex flex-col items-center">
+        
+        <!-- Automaten-Gehäuse -->
+        <div class="relative w-full bg-slate-900 arcade-frame p-3 flex flex-col items-center">
+          
+          <!-- Automaten-Kopfzeile (Anzeige Fähigkeit) -->
+          <div class="w-full flex justify-between items-center bg-slate-950/80 px-4 py-2 rounded-lg mb-2 border border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 uppercase tracking-widest">Aktivierter Kniff:</span>
+              <span id="active-ability-label" class="text-sm font-bold text-cyan-400 neon-text-green">🧲 MAGNET-IMPULS</span>
+            </div>
+            
+            <!-- Energie-Balken für Fähigkeit -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400">ENERGIE:</span>
+              <div class="w-24 bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                <div id="energy-bar" class="bg-gradient-to-r from-cyan-500 to-emerald-400 h-full w-full transition-all duration-200"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Canvas Spielfeld -->
+          <div class="relative w-full aspect-[4/3] bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950/40 rounded-xl overflow-hidden border-2 border-indigo-900/60 shadow-inner">
+            <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+            
+            <!-- Floating Text Overlay für Nachrichten -->
+            <div id="toast-message" class="absolute top-4 left-1/2 -translate-x-1/2 bg-purple-900/90 border border-purple-400 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-xl pointer-events-none opacity-0 transition-opacity duration-300">
+              Nachricht...
+            </div>
+          </div>
+
+          <!-- Bedienteil / Controls -->
+          <div class="w-full mt-3 bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col gap-3">
+            
+            <!-- Kniff-Auswahl Tasten -->
+            <div class="grid grid-cols-3 gap-2">
+              <button id="ability-magnet" class="ability-btn bg-slate-800 border-2 border-cyan-500 text-cyan-300 py-2 rounded-lg font-bold text-xs flex flex-col items-center gap-0.5 hover:bg-cyan-950/40 active:scale-95 transition">
+                <span class="text-base">🧲</span>
+                <span>MAGNET</span>
+              </button>
+              <button id="ability-shrink" class="ability-btn bg-slate-800 border-2 border-slate-700 text-slate-400 py-2 rounded-lg font-bold text-xs flex flex-col items-center gap-0.5 hover:bg-emerald-950/40 active:scale-95 transition">
+                <span class="text-base">🔬</span>
+                <span>SCHRUMPFEN</span>
+              </button>
+              <button id="ability-freeze" class="ability-btn bg-slate-800 border-2 border-slate-700 text-slate-400 py-2 rounded-lg font-bold text-xs flex flex-col items-center gap-0.5 hover:bg-purple-950/40 active:scale-95 transition">
+                <span class="text-base">⏱️</span>
+                <span>STASIS</span>
+              </button>
+            </div>
+
+            <!-- Haupt-Steuerung (Joystick & Greifen) -->
+            <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
+              
+              <!-- Steuerkreuz / Pfeile -->
+              <div class="flex items-center gap-2">
+                <button id="btn-left" class="w-14 h-12 bg-slate-800 hover:bg-slate-700 active:bg-purple-700 text-white text-xl rounded-xl border border-slate-600 flex items-center justify-center font-bold active:scale-95 transition shadow-md">
+                  ◄
+                </button>
+                <button id="btn-right" class="w-14 h-12 bg-slate-800 hover:bg-slate-700 active:bg-purple-700 text-white text-xl rounded-xl border border-slate-600 flex items-center justify-center font-bold active:scale-95 transition shadow-md">
+                  ►
+                </button>
+              </div>
+
+              <!-- Kniff Auslöser & Greifen -->
+              <div class="flex items-center gap-2">
+                <button id="btn-trigger-ability" class="h-12 px-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 active:scale-95 transition text-white font-bold text-xs rounded-xl border border-cyan-300/50 shadow-lg flex items-center gap-1">
+                  ⚡ KNIFF!
+                </button>
+                
+                <button id="btn-drop" class="h-12 px-6 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-95 transition text-white font-extrabold text-sm rounded-xl border border-emerald-300/50 shadow-lg flex items-center gap-1 neon-border-cyan">
+                  🎯 GREIFEN
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Rechte Spalte: Sammlungs-Galerie & Ausbeute -->
+      <div class="md:col-span-4 flex flex-col gap-4">
+        
+        <!-- Letzte Beute -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col items-center text-center shadow-md">
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Auswurf-Schacht</h2>
+          <div id="prize-drop-zone" class="w-full h-28 bg-slate-950 rounded-lg border-2 border-dashed border-slate-800 flex flex-col items-center justify-center p-2 relative overflow-hidden">
+            <span class="text-3xl mb-1 opacity-40">📦</span>
+            <p class="text-xs text-slate-500">Greife einen Preis, um ihn hier aufzusammeln!</p>
+          </div>
+        </div>
+
+        <!-- Sammlung -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex-1 flex flex-col shadow-md">
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-sm font-bold text-purple-300 flex items-center gap-1.5">
+              <span>🏆</span> DEINE SAMMLUNG
+            </h2>
+            <span id="collection-count" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400">0 / 6</span>
+          </div>
+
+          <!-- Items Grid -->
+          <div id="collection-grid" class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[220px] p-1">
+            <!-- Dynamisch gefüllt -->
+          </div>
+        </div>
+
+        <!-- Anleitung / Tipps -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-400 space-y-1">
+          <p class="font-bold text-slate-300">💡 Steuerung & Kniffe:</p>
+          <p>• <b>Pfeiltasten / A,D:</b> Greifarm bewegen</p>
+          <p>• <b>Leertaste:</b> Greifarm absenken</p>
+          <p>• <b>E / Shift:</b> Aktiven Kniff-Zauber wirken</p>
+          <p>• Achtung: Schwerere Objekte erfordern ein Greifkraft-Upgrade!</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- SHOP MODAL -->
+  <div id="shop-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border-2 border-purple-500 rounded-2xl w-full max-w-md p-5 shadow-2xl flex flex-col gap-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h2 class="text-xl font-bold text-purple-400 flex items-center gap-2">
+          <span>🛒</span> Quanten-Werkstatt
+        </h2>
+        <button id="btn-close-shop" class="text-slate-400 hover:text-white text-xl font-bold px-2">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Upgrade 1: Greifkraft -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-sm text-amber-300">💪 Greifkraft</h3>
+            <p class="text-xs text-slate-400">Verhindert Rutschen bei schweren Objekten</p>
+            <p class="text-xs text-purple-400 mt-1">Stufe: <span id="lvl-grip">1</span></p>
+          </div>
+          <button id="buy-grip" class="bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-bold text-xs px-3 py-2 rounded-lg border border-amber-400 flex items-center gap-1">
+            <span id="cost-grip">150</span> 🪙
+          </button>
+        </div>
+
+        <!-- Upgrade 2: Motortempo -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-sm text-cyan-300">⚡ Motor-Geschwindigkeit</h3>
+            <p class="text-xs text-slate-400">Greifer bewegt sich schneller</p>
+            <p class="text-xs text-purple-400 mt-1">Stufe: <span id="lvl-speed">1</span></p>
+          </div>
+          <button id="buy-speed" class="bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white font-bold text-xs px-3 py-2 rounded-lg border border-cyan-400 flex items-center gap-1">
+            <span id="cost-speed">100</span> 🪙
+          </button>
+        </div>
+
+        <!-- Upgrade 3: Batterie -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-sm text-emerald-300">🔋 Kniff-Batterie</h3>
+            <p class="text-xs text-slate-400">Schnellere Energie-Regeneration</p>
+            <p class="text-xs text-purple-400 mt-1">Stufe: <span id="lvl-battery">1</span></p>
+          </div>
+          <button id="buy-battery" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs px-3 py-2 rounded-lg border border-emerald-400 flex items-center gap-1">
+            <span id="cost-battery">120</span> 🪙
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-2 text-center text-xs text-slate-500">
+        Verdiene Münzen durch das Fangen von Objekten im Automaten!
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT GAME ENGINE -->
+  <script>
+    // --- AUDIO SYNTHESIS (Web Audio API) ---
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+      playBeep(freq = 440, type = 'sine', duration = 0.1, vol = 0.1) {
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e){}
+      }
+      playMotor() {
+        this.playBeep(120, 'sawtooth', 0.05, 0.03);
+      }
+      playGrab() {
+        this.playBeep(300, 'square', 0.15, 0.1);
+        setTimeout(() => this.playBeep(450, 'square', 0.15, 0.1), 100);
+      }
+      playWin() {
+        [400, 520, 650, 800].forEach((freq, idx) => {
+          setTimeout(() => this.playBeep(freq, 'triangle', 0.2, 0.15), idx * 90);
+        });
+      }
+      playAbility() {
+        this.playBeep(800, 'sine', 0.3, 0.12);
+        setTimeout(() => this.playBeep(1200, 'sine', 0.3, 0.12), 100);
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    // --- GAME CONFIG & STATE ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Canvas interne Auflösung
+    canvas.width = 600;
+    canvas.height = 450;
+
+    const STATE = {
+      coins: 100,
+      activeAbility: 'MAGNET', // MAGNET, SHRINK, FREEZE
+      energy: 100,
+      maxEnergy: 100,
+      energyRegen: 0.25,
+      
+      // Upgrades
+      upgrades: {
+        grip: { level: 1, cost: 150 },
+        speed: { level: 1, cost: 100 },
+        battery: { level: 1, cost: 120 }
+      },
+
+      // Sammlungs-Fortschritt
+      collectedTypes: new Set(),
+
+      // Greifarm Status
+      claw: {
+        x: canvas.width / 2,
+        y: 60,
+        minY: 60,
+        maxY: canvas.height - 90,
+        speed: 2.5,
+        state: 'IDLE', // IDLE, MOVING_LEFT, MOVING_RIGHT, DROPPING, CLOSING, RETRACTING, GOING_TO_CHUTE, RELEASING
+        grabbedItem: null,
+        openAngle: 0.6, // rad
+        targetOpenAngle: 0.6,
+        armLength: 50
+      }
+    };
+
+    // Chute (Auswurfbereich unten links)
+    const CHUTE = {
+      x: 10,
+      y: canvas.height - 110,
+      width: 100,
+      height: 100
+    };
+
+    // Item Arten Katalog
+    const ITEM_TYPES = [
+      { id: 'bear', name: 'Plüsch-Bär', icon: '🧸', radius: 24, weight: 1.0, value: 80, color: '#f59e0b', metallic: false, floating: false },
+      { id: 'balloon', name: 'Helium-Ballon', icon: '🎈', radius: 22, weight: 0.2, value: 50, color: '#ef4444', metallic: false, floating: true },
+      { id: 'crown', name: 'Gold-Krone', icon: '👑', radius: 20, weight: 2.2, value: 250, color: '#eab308', metallic: true, floating: false },
+      { id: 'duck', name: 'Quietsche-Ente', icon: '🦆', radius: 18, weight: 0.6, value: 60, color: '#facc15', metallic: false, floating: false },
+      { id: 'gem', name: 'Quanten-Kristall', icon: '💎', radius: 19, weight: 1.5, value: 300, color: '#06b6d4', metallic: true, floating: false },
+      { id: 'alien', name: 'Plüsch-Alien', icon: '👾', radius: 25, weight: 1.2, value: 150, color: '#a855f7', metallic: false, floating: false }
+    ];
+
+    // Aktive Physik-Objekte im Automaten
+    let items = [];
+
+    // Effekte / Partikel
+    let particles = [];
+
+    // Tasten-Eingaben
+    const keys = { left: false, right: false, drop: false };
+
+    // --- INITIALISIERUNG ---
+    function initItems() {
+      items = [];
+      const floorY = canvas.height - 35;
+
+      // Generiere eine bunten Haufen an Preisen auf dem Boden
+      for (let i = 0; i < 14; i++) {
+        const type = ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
+        const rx = 130 + Math.random() * (canvas.width - 160);
+        const ry = floorY - 20 - Math.random() * 80;
+
+        items.push({
+          ...type,
+          x: rx,
+          y: ry,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: 0,
+          currentRadius: type.radius,
+          isFrozen: false,
+          freezeTimer: 0
+        });
+      }
+    }
+
+    // --- PHYSIK ENGINE ---
+    function updatePhysics() {
+      const floorY = canvas.height - 30;
+
+      // Energie Regeneration
+      if (STATE.energy < STATE.maxEnergy) {
+        STATE.energy = Math.min(STATE.maxEnergy, STATE.energy + STATE.energyRegen * (1 + STATE.upgrades.battery.level * 0.3));
+        updateEnergyBarUI();
+      }
+
+      // Update Partikel
+      particles.forEach((p, idx) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.02;
+        if (p.alpha <= 0) particles.splice(idx, 1);
+      });
+
+      // Update Gegenstände
+      items.forEach((item) => {
+        if (item.isFrozen) {
+          item.freezeTimer--;
+          if (item.freezeTimer <= 0) item.isFrozen = false;
+          return;
+        }
+
+        // Wenn nicht am Greifarm fixiert
+        if (STATE.claw.grabbedItem !== item) {
+          
+          // Schwerkraft / Augetrieb
+          if (item.floating) {
+            item.vy -= 0.08; // Geht nach oben
+            if (item.y < 80) { item.y = 80; item.vy = 0; }
+          } else {
+            item.vy += 0.25; // Normale Gravitation
+          }
+
+          // Position updaten
+          item.x += item.vx;
+          item.y += item.vy;
+
+          // Reibung
+          item.vx *= 0.95;
+
+          // Boden Kollision
+          if (item.y + item.currentRadius > floorY) {
+            item.y = floorY - item.currentRadius;
+            item.vy = -item.vy * 0.3; // Bounciness
+          }
+
+          // Wände Kollision
+          if (item.x - item.currentRadius < CHUTE.x + CHUTE.width) {
+            // Auswurf-Schacht Wand
+            if (item.y > CHUTE.y) {
+              item.x = CHUTE.x + CHUTE.width + item.currentRadius;
+              item.vx = -item.vx * 0.5;
+            }
+          }
+          if (item.x + item.currentRadius > canvas.width - 10) {
+            item.x = canvas.width - 10 - item.currentRadius;
+            item.vx = -item.vx * 0.5;
+          }
+
+          // Kollisionen zwischen Items (einfache Kreisabstoßung)
+          items.forEach((other) => {
+            if (item === other) return;
+            const dx = other.x - item.x;
+            const dy = other.y - item.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const minDist = item.currentRadius + other.currentRadius;
+
+            if (dist < minDist && dist > 0) {
+              const overlap = minDist - dist;
+              const nx = dx / dist;
+              const ny = dy / dist;
+
+              item.x -= nx * overlap * 0.5;
+              item.y -= ny * overlap * 0.5;
+              other.x += nx * overlap * 0.5;
+              other.y += ny * overlap * 0.5;
+            }
+          });
+
+        } else {
+          // Objekt wird vom Greifarm gehalten
+          item.x = STATE.claw.x;
+          item.y = STATE.claw.y + 35;
+          item.vx = 0;
+          item.vy = 0;
+
+          // Überprüfung ob das Objekt wegen hohem Gewicht abrutscht!
+          const gripPowerLimit = 1.0 + (STATE.upgrades.grip.level * 0.5);
+          if (item.weight > gripPowerLimit && Math.random() < 0.03) {
+            // Rutscht ab!
+            STATE.claw.grabbedItem = null;
+            showToast("⚠️ Objekt ist zu schwer! Rutscht ab!");
+            createParticles(item.x, item.y, '#f59e0b', 8);
+          }
+        }
+      });
+
+      // --- GREIFARM LOGIK ---
+      const claw = STATE.claw;
+      const speed = claw.speed * (1 + STATE.upgrades.speed.level * 0.25);
+
+      // Sanftes Anpassen des Greifwinkel
+      claw.openAngle += (claw.targetOpenAngle - claw.openAngle) * 0.15;
+
+      // Tastatur/Button Manuelle Bewegung (nur wenn IDLE)
+      if (claw.state === 'IDLE') {
+        if (keys.left && claw.x > CHUTE.x + CHUTE.width + 30) {
+          claw.x -= speed;
+          sound.playMotor();
+        }
+        if (keys.right && claw.x < canvas.width - 40) {
+          claw.x += speed;
+          sound.playMotor();
+        }
+      }
+
+      // Zustandsmaschine des Greifarms
+      switch (claw.state) {
+        case 'DROPPING':
+          claw.targetOpenAngle = 0.8; // Weit offen
+          claw.y += speed * 1.5;
+
+          // Prüfe Boden oder Kollision mit Item
+          const hitItem = items.find(it => {
+            const dx = it.x - claw.x;
+            const dy = it.y - (claw.y + 20);
+            return Math.sqrt(dx*dx + dy*dy) < it.currentRadius + 15;
+          });
+
+          if (claw.y >= claw.maxY || hitItem) {
+            claw.state = 'CLOSING';
+            sound.playGrab();
+          }
+          break;
+
+        case 'CLOSING':
+          claw.targetOpenAngle = 0.2; // Greifer schließt sich
+
+          if (Math.abs(claw.openAngle - claw.targetOpenAngle) < 0.05) {
+            // Finde engstes Objekt im Greifer
+            const target = items.find(it => {
+              const dx = Math.abs(it.x - claw.x);
+              const dy = Math.abs(it.y - (claw.y + 25));
+              return dx < 28 && dy < 30;
+            });
+
+            if (target) {
+              claw.grabbedItem = target;
+              showToast(`Gegriffen: ${target.name}!`);
+            } else {
+              showToast("Nichts erwischt!");
+            }
+
+            claw.state = 'RETRACTING';
+          }
+          break;
+
+        case 'RETRACTING':
+          claw.y -= speed * 1.2;
+          if (claw.y <= claw.minY) {
+            claw.y = claw.minY;
+            claw.state = 'GOING_TO_CHUTE';
+          }
+          break;
+
+        case 'GOING_TO_CHUTE':
+          const targetX = CHUTE.x + CHUTE.width / 2;
+          if (claw.x > targetX) {
+            claw.x -= speed * 1.2;
+            sound.playMotor();
+          } else {
+            claw.x = targetX;
+            claw.state = 'RELEASING';
+          }
+          break;
+
+        case 'RELEASING':
+          claw.targetOpenAngle = 0.8; // Öffnen über dem Schacht
+
+          setTimeout(() => {
+            if (claw.grabbedItem) {
+              const prize = claw.grabbedItem;
+              collectPrize(prize);
+              
+              // Entferne gekauften/gefangenen Gegenstand
+              items = items.filter(i => i !== prize);
+              claw.grabbedItem = null;
+            }
+
+            claw.targetOpenAngle = 0.6;
+            claw.state = 'IDLE';
+
+            // Respawn neue Gegenstände falls wenige übrig
+            if (items.length < 8) {
+              setTimeout(initItems, 2000);
+            }
+          }, 400);
+          break;
+      }
+    }
+
+    // --- KNIFF FÄHIGKEITEN AUSLÖSEN ---
+    function triggerAbility() {
+      sound.init();
+
+      if (STATE.energy < 35) {
+        showToast("⚠️ Nicht genug Kniff-Energie!");
+        return;
+      }
+
+      STATE.energy -= 35;
+      updateEnergyBarUI();
+      sound.playAbility();
+
+      const claw = STATE.claw;
+
+      if (STATE.activeAbility === 'MAGNET') {
+        showToast("🧲 Magnet-Impuls aktiviert!");
+        createParticles(claw.x, claw.y + 40, '#06b6d4', 25);
+
+        // Zieht metallische/goldene Objekte zur Kralle
+        items.forEach(item => {
+          if (item.metallic || item.weight > 1.8) {
+            const dx = claw.x - item.x;
+            const dy = (claw.y + 40) - item.y;
+            item.vx += dx * 0.15;
+            item.vy += dy * 0.15;
+            createParticles(item.x, item.y, '#eab308', 4);
+          }
+        });
+      } 
+      else if (STATE.activeAbility === 'SHRINK') {
+        showToast("🔬 Schrumpf-Strahl aktiviert!");
+        createParticles(claw.x, claw.y + 40, '#22c55e', 25);
+
+        // Verkleinert Gegenstände direkt unter der Kralle
+        items.forEach(item => {
+          if (Math.abs(item.x - claw.x) < 80 && item.y > claw.y) {
+            item.currentRadius = Math.max(10, item.currentRadius * 0.6);
+            item.weight = item.weight * 0.5; // Macht sie leichter!
+            createParticles(item.x, item.y, '#22c55e', 8);
+          }
+        });
+      } 
+      else if (STATE.activeAbility === 'FREEZE') {
+        showToast("⏱️ Zeit-Stasis aktiviert!");
+        createParticles(claw.x, claw.y + 40, '#a855f7', 25);
+
+        // Friert alle Items für 5 Sekunden ein
+        items.forEach(item => {
+          item.isFrozen = true;
+          item.freezeTimer = 300; // 5 Sekunden bei 60fps
+          item.vx = 0;
+          item.vy = 0;
+        });
+      }
+    }
+
+    // --- PREIS GEWONNEN ---
+    function collectPrize(prize) {
+      sound.playWin();
+      STATE.coins += prize.value;
+      STATE.collectedTypes.add(prize.id);
+
+      updateCoinsUI();
+      updateCollectionUI();
+
+      // Drop Zone UI Update
+      const dropZone = document.getElementById('prize-drop-zone');
+      dropZone.innerHTML = `
+        <div class="animate-bounce flex flex-col items-center">
+          <span class="text-4xl">${prize.icon}</span>
+          <span class="text-xs font-bold text-emerald-400 mt-1">${prize.name}</span>
+          <span class="text-[10px] text-amber-300 font-bold">+${prize.value} Münzen!</span>
+        </div>
+      `;
+
+      showToast(`🎉 Gewonnen: ${prize.name} (+${prize.value}🪙)`);
+      createParticles(CHUTE.x + 50, CHUTE.y + 30, '#10b981', 30);
+    }
+
+    // --- RENDERING (CANVAS DRAWING) ---
+    function render() {
+      // Hinterrund Clearen
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 1. Auswurf-Schacht zeichnen
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      ctx.fillRect(CHUTE.x, CHUTE.y, CHUTE.width, CHUTE.height);
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(CHUTE.x, CHUTE.y, CHUTE.width, CHUTE.height);
+
+      ctx.fillStyle = '#60a5fa';
+      ctx.font = '10px "Press Start 2P"';
+      ctx.fillText('AUSWURF', CHUTE.x + 12, CHUTE.y + 20);
+
+      // 2. Ziel-Laser / Strahl vom Greifarm (Visualisierung des Kniffs)
+      const claw = STATE.claw;
+      ctx.save();
+      if (STATE.activeAbility === 'MAGNET') {
+        ctx.strokeStyle = 'rgba(6, 182, 212, 0.15)';
+      } else if (STATE.activeAbility === 'SHRINK') {
+        ctx.strokeStyle = 'rgba(34, 197, 94, 0.15)';
+      } else {
+        ctx.strokeStyle = 'rgba(168, 85, 247, 0.15)';
+      }
+      ctx.lineWidth = 40;
+      ctx.beginPath();
+      ctx.moveTo(claw.x, claw.y);
+      ctx.lineTo(claw.x, canvas.height - 30);
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. Items / Gewinne zeichnen
+      items.forEach(item => {
+        ctx.save();
+        ctx.translate(item.x, item.y);
+
+        // Stasis Ring Effect
+        if (item.isFrozen) {
+          ctx.strokeStyle = '#c084fc';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, item.currentRadius + 4, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Schatten
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(0, item.currentRadius - 2, item.currentRadius * 0.8, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Icon / Ball
+        ctx.font = `${item.currentRadius * 1.6}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.icon, 0, 0);
+
+        ctx.restore();
+      });
+
+      // 4. Partikel zeichnen
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // 5. Greifarm / Mechanik zeichnen
+      ctx.save();
+      
+      // Oberer Schienenstrang
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(0, 15, canvas.width, 12);
+
+      // Kabel vom Dach zur Kralle
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(claw.x, 20);
+      ctx.lineTo(claw.x, claw.y);
+      ctx.stroke();
+
+      // Greifer-Gehäuse
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(claw.x - 16, claw.y - 10, 32, 20);
+      ctx.fillStyle = '#38bdf8'; // Leuchtende LED am Kopf
+      ctx.fillRect(claw.x - 4, claw.y - 6, 8, 6);
+
+      // Greifer Zangen (Prongs)
+      const drawProng = (sideMultiplier) => {
+        ctx.save();
+        ctx.translate(claw.x + (sideMultiplier * 10), claw.y + 10);
+        ctx.rotate(sideMultiplier * claw.openAngle);
+
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(sideMultiplier * 12, 22);
+        ctx.lineTo(sideMultiplier * 4, 38);
+        ctx.stroke();
+
+        ctx.restore();
+      };
+
+      drawProng(-1); // Linke Zange
+      drawProng(1);  // Rechte Zange
+
+      ctx.restore();
+    }
+
+    // --- HELPER & EFFEKTE ---
+    function createParticles(x, y, color, count = 10) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4,
+          size: Math.random() * 4 + 2,
+          color: color,
+          alpha: 1.0
+        });
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      toast.innerText = msg;
+      toast.style.opacity = '1';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+      }, 2000);
+    }
+
+    function updateCoinsUI() {
+      document.getElementById('coin-display').innerText = STATE.coins;
+    }
+
+    function updateEnergyBarUI() {
+      const bar = document.getElementById('energy-bar');
+      const pct = (STATE.energy / STATE.maxEnergy) * 100;
+      bar.style.width = `${pct}%`;
+    }
+
+    function updateCollectionUI() {
+      const grid = document.getElementById('collection-grid');
+      const countEl = document.getElementById('collection-count');
+      grid.innerHTML = '';
+
+      countEl.innerText = `${STATE.collectedTypes.size} / ${ITEM_TYPES.length}`;
+
+      ITEM_TYPES.forEach(type => {
+        const isCaught = STATE.collectedTypes.has(type.id);
+        const itemEl = document.createElement('div');
+        itemEl.className = `p-2 rounded-lg border flex flex-col items-center justify-center text-center ${
+          isCaught ? 'bg-slate-800 border-purple-500/60' : 'bg-slate-950/60 border-slate-800 opacity-40'
+        }`;
+        itemEl.innerHTML = `
+          <span class="text-2xl">${type.icon}</span>
+          <span class="text-[10px] font-bold text-slate-300 mt-1 truncate w-full">${type.name}</span>
+        `;
+        grid.appendChild(itemEl);
+      });
+    }
+
+    // --- EVENT LISTENER & USER INTERACTION ---
+    function setupControls() {
+      // Kniff Tasten
+      const setAbility = (type, btnId, nameStr) => {
+        document.querySelectorAll('.ability-btn').forEach(b => {
+          b.classList.remove('border-cyan-500', 'border-emerald-500', 'border-purple-500', 'text-cyan-300', 'text-emerald-300', 'text-purple-300');
+          b.classList.add('border-slate-700', 'text-slate-400');
+        });
+
+        STATE.activeAbility = type;
+        const activeBtn = document.getElementById(btnId);
+        activeBtn.classList.remove('border-slate-700', 'text-slate-400');
+
+        let colorClass = 'text-cyan-400';
+        if (type === 'MAGNET') activeBtn.classList.add('border-cyan-500', 'text-cyan-300');
+        if (type === 'SHRINK') { activeBtn.classList.add('border-emerald-500', 'text-emerald-300'); colorClass = 'text-emerald-400'; }
+        if (type === 'FREEZE') { activeBtn.classList.add('border-purple-500', 'text-purple-300'); colorClass = 'text-purple-400'; }
+
+        const label = document.getElementById('active-ability-label');
+        label.className = `text-sm font-bold ${colorClass}`;
+        label.innerText = nameStr;
+      };
+
+      document.getElementById('ability-magnet').addEventListener('click', () => setAbility('MAGNET', 'ability-magnet', '🧲 MAGNET-IMPULS'));
+      document.getElementById('ability-shrink').addEventListener('click', () => setAbility('SHRINK', 'ability-shrink', '🔬 SCHRUMPFEN'));
+      document.getElementById('ability-freeze').addEventListener('click', () => setAbility('FREEZE', 'ability-freeze', '⏱️ ZEIT-STASIS'));
+
+      // Action Buttons
+      const triggerDrop = () => {
+        sound.init();
+        if (STATE.claw.state === 'IDLE') {
+          STATE.claw.state = 'DROPPING';
+        }
+      };
+
+      document.getElementById('btn-drop').addEventListener('click', triggerDrop);
+      document.getElementById('btn-trigger-ability').addEventListener('click', triggerAbility);
+
+      // Pfeil Buttons (Touch / Click Holding)
+      const btnLeft = document.getElementById('btn-left');
+      const btnRight = document.getElementById('btn-right');
+
+      const bindBtn = (el, keyName) => {
+        const start = (e) => { e.preventDefault(); sound.init(); keys[keyName] = true; };
+        const end = (e) => { e.preventDefault(); keys[keyName] = false; };
+        el.addEventListener('mousedown', start);
+        el.addEventListener('mouseup', end);
+        el.addEventListener('touchstart', start);
+        el.addEventListener('touchend', end);
+      };
+
+      bindBtn(btnLeft, 'left');
+      bindBtn(btnRight, 'right');
+
+      // Tastatur Steuerung
+      window.addEventListener('keydown', (e) => {
+        sound.init();
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+        if (e.key === ' ' || e.key === 'ArrowDown') triggerDrop();
+        if (e.key === 'e' || e.key === 'E' || e.key === 'Shift') triggerAbility();
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+      });
+
+      // Shop Modal Handling
+      const shopModal = document.getElementById('shop-modal');
+      document.getElementById('btn-shop').addEventListener('click', () => shopModal.classList.remove('hidden'));
+      document.getElementById('btn-close-shop').addEventListener('click', () => shopModal.classList.add('hidden'));
+
+      // Upgrades kaufen
+      const setupUpgrade = (btnId, type, lvlElId, costElId) => {
+        document.getElementById(btnId).addEventListener('click', () => {
+          const up = STATE.upgrades[type];
+          if (STATE.coins >= up.cost) {
+            STATE.coins -= up.cost;
+            up.level++;
+            up.cost = Math.floor(up.cost * 1.6);
+            
+            document.getElementById(lvlElId).innerText = up.level;
+            document.getElementById(costElId).innerText = up.cost;
+            updateCoinsUI();
+            showToast("Upgrade erfolgreich gekauft!");
+            sound.playWin();
+          } else {
+            showToast("❌ Nicht genug Münzen!");
+          }
+        });
+      };
+
+      setupUpgrade('buy-grip', 'grip', 'lvl-grip', 'cost-grip');
+      setupUpgrade('buy-speed', 'speed', 'lvl-speed', 'cost-speed');
+      setupUpgrade('buy-battery', 'battery', 'lvl-battery', 'cost-battery');
+    }
+
+    // --- GAME LOOP ---
+    function gameLoop() {
+      updatePhysics();
+      render();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // --- START ---
+    window.onload = () => {
+      initItems();
+      setupControls();
+      updateCollectionUI();
+      gameLoop();
+    };
+  </script>
+</body>
+</html>
