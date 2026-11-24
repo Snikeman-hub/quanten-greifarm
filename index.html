@@ -153,8 +153,8 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-lg sm:text-2xl font-bold tracking-wider text-purple-300 neon-text-purple">QUANTEN-GREIFARM</h1>
-            <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
-              Phase 2 • Kombo & Hazards
+            <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              Phase 3 • Aufträge & Sets
             </span>
           </div>
           <p class="text-xs text-slate-400">Manipuliere Schwerkraft, Masse & Zeit im Arcade-Automaten</p>
@@ -188,7 +188,7 @@
       </div>
     </header>
 
-    <!-- Hauptbereich: Automat (Links) & Schacht/Sammlung (Rechts) -->
+    <!-- Hauptbereich: Automat (Links) & Schacht/Tabs (Rechts) -->
     <main class="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
 
       <!-- Linke Spalte (8/12): Das Arcade-Kabinett -->
@@ -319,11 +319,11 @@
         </div>
       </section>
 
-      <!-- Rechte Spalte (4/12): Interaktiver Auswurf-Schacht & Sammlung -->
-      <aside class="lg:col-span-4 flex flex-col gap-4">
+      <!-- Rechte Spalte (4/12): Interaktiver Auswurf-Schacht & Tab-Panel (Aufträge / Sammlung / Sets) -->
+      <aside class="lg:col-span-4 flex flex-col gap-3.5">
         
         <!-- Interaktiver Auswurf-Schacht (Schaukasten) -->
-        <div class="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 shadow-xl">
+        <div class="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-3.5 shadow-xl">
           <div class="flex items-center justify-between mb-2">
             <h2 class="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -334,52 +334,88 @@
             </span>
           </div>
 
-          <div id="prize-drop-zone" class="w-full min-h-[116px] bg-gradient-to-b from-slate-950 to-slate-900 rounded-xl border-2 border-dashed border-slate-700/90 flex flex-col items-center justify-center p-3 relative overflow-hidden transition-all">
+          <div id="prize-drop-zone" class="w-full min-h-[104px] bg-gradient-to-b from-slate-950 to-slate-900 rounded-xl border-2 border-dashed border-slate-700/90 flex flex-col items-center justify-center p-2.5 relative overflow-hidden transition-all">
             <span class="text-3xl mb-1 opacity-35">📥</span>
             <p class="text-xs text-slate-400 text-center">Greife einen Preis und befördere ihn links in den Schacht!</p>
           </div>
         </div>
 
-        <!-- Sammlungs-Galerie -->
-        <div class="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 shadow-xl flex flex-col">
-          <div class="flex justify-between items-center mb-3">
-            <h2 class="text-sm font-bold text-purple-300 flex items-center gap-1.5 tracking-wide">
-              <span>🏆</span> PREIS-KATALOG & SAMMLUNG
-            </h2>
-            <span id="collection-count" class="pixel-font text-[10px] bg-purple-950/80 border border-purple-500/40 px-2 py-1 rounded-lg text-purple-300">
-              0 / 7
-            </span>
+        <!-- Tab-Navigation: Aufträge | Sammlung | Sets & Boni -->
+        <div class="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-3.5 shadow-xl flex flex-col gap-3">
+          <div class="grid grid-cols-3 gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <button id="tab-btn-quests" data-tab="quests" class="side-tab-btn py-1.5 px-2 rounded-lg text-xs font-bold bg-purple-600/30 text-purple-200 border border-purple-500/50 transition flex items-center justify-center gap-1">
+              <span>📋</span> Aufträge
+            </button>
+            <button id="tab-btn-collection" data-tab="collection" class="side-tab-btn py-1.5 px-2 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 border border-transparent transition flex items-center justify-center gap-1">
+              <span>🏆</span> Katalog
+            </button>
+            <button id="tab-btn-sets" data-tab="sets" class="side-tab-btn py-1.5 px-2 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 border border-transparent transition flex items-center justify-center gap-1">
+              <span>✨</span> Sets
+            </button>
           </div>
 
-          <div id="collection-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5">
-            <!-- Wird dynamisch per JS befüllt -->
+          <!-- TAB 1: Runden-Aufträge -->
+          <div id="tab-panel-quests" class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-cyan-300 uppercase tracking-wider">Aktive Runden-Aufträge</span>
+              <span id="quests-completed-badge" class="text-[11px] text-slate-400">Abgeschlossen: 0</span>
+            </div>
+            <div id="quests-list" class="space-y-2">
+              <!-- Wird dynamisch per JS befüllt -->
+            </div>
+          </div>
+
+          <!-- TAB 2: Preis-Katalog & Sammlung -->
+          <div id="tab-panel-collection" class="hidden space-y-2.5">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-purple-300 uppercase tracking-wider">Entdeckte Preise</span>
+              <span id="collection-count" class="pixel-font text-[10px] bg-purple-950/80 border border-purple-500/40 px-2 py-0.5 rounded-lg text-purple-300">
+                0 / 7
+              </span>
+            </div>
+            <div id="collection-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2">
+              <!-- Wird dynamisch per JS befüllt -->
+            </div>
+          </div>
+
+          <!-- TAB 3: Sammlungs-Sets & Passive Boni -->
+          <div id="tab-panel-sets" class="hidden space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Set-Boni (Passiv)</span>
+              <span id="sets-unlocked-badge" class="text-[11px] text-slate-400">0 / 3 Sets</span>
+            </div>
+            <div id="sets-list" class="space-y-2">
+              <!-- Wird dynamisch per JS befüllt -->
+            </div>
           </div>
         </div>
 
-        <!-- Greifer-Telemetrie & Kurz-Guide -->
-        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-3.5 text-xs text-slate-400 space-y-1.5">
-          <div class="flex items-center justify-between text-slate-200 font-bold border-b border-slate-800 pb-1.5">
+        <!-- Greifer-Telemetrie -->
+        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-3 text-xs text-slate-400 space-y-1">
+          <div class="flex items-center justify-between text-slate-200 font-bold border-b border-slate-800 pb-1">
             <span>📡 GREIFER-TELEMETRIE</span>
-            <span id="telemetry-grip-limit" class="text-emerald-400">Max. Tragkraft: 1.5 kg</span>
+            <span id="telemetry-grip-limit" class="text-emerald-400">Tragkraft: 1.5 kg</span>
           </div>
-          <p>• <b class="text-amber-300">Kombo-Serie:</b> Jede erfolgreiche Ausbeute steigert den Münz-Multiplikator (+0.2x bis 2.5x). Fehlschläge setzen ihn zurück!</p>
-          <p>• <b class="text-cyan-300">Spezial-Kerne:</b> ⚡ Lädt 100% Energie • 💣 Löst EMP aus (mit Magnet wegräumen!) • 🎁 Glatte Kapsel mit Bonus-Loot.</p>
+          <div class="flex items-center justify-between text-[11px]">
+            <span>🧲 Krallen-Haftung: <b id="telemetry-friction" class="text-cyan-300">+0%</b></span>
+            <span>📡 Ziel-Visier: <b id="telemetry-laser" class="text-purple-300">Stufe 1</b></span>
+          </div>
         </div>
 
       </aside>
     </main>
   </div>
 
-  <!-- Quanten-Werkstatt (Shop Overlay Modal) -->
+  <!-- Quanten-Werkstatt (Shop Overlay Modal mit Upgrades & Skins) -->
   <div id="shop-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-    <div class="bg-slate-900 border-2 border-purple-500/60 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 animate-pop">
+    <div class="bg-slate-900 border-2 border-purple-500/60 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-pop max-h-[90vh] flex flex-col">
       
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
         <div class="flex items-center gap-2.5">
           <span class="text-2xl">🛠️</span>
           <div>
             <h2 class="text-lg font-bold text-purple-300 tracking-wide">QUANTEN-WERKSTATT</h2>
-            <p class="text-xs text-slate-400">Verbessere Greifarm & Reaktor-Kapazität</p>
+            <p class="text-xs text-slate-400">Upgrades, Ziel-Laser & Greifarm-Skins</p>
           </div>
         </div>
         <button id="btn-close-shop" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center transition">
@@ -387,19 +423,26 @@
         </button>
       </div>
 
-      <!-- Aktuelles Guthaben im Modal -->
-      <div class="bg-slate-950/90 border border-amber-500/30 rounded-xl px-4 py-2 flex items-center justify-between">
-        <span class="text-xs text-slate-400 uppercase font-semibold">Verfügbare Münzen:</span>
+      <!-- Aktuelles Guthaben & Werkstatt-Tabs -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-950/90 border border-amber-500/30 rounded-xl px-3.5 py-2 shrink-0">
         <div class="flex items-center gap-1.5">
           <span class="text-base">🪙</span>
           <span id="shop-coin-display" class="pixel-font text-sm text-amber-300">150</span>
         </div>
+        <div class="flex gap-1.5">
+          <button id="shop-tab-upgrades" class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white border border-indigo-400 transition">
+            ⚙️ Upgrades (5)
+          </button>
+          <button id="shop-tab-skins" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">
+            🎨 Greifer-Skins
+          </button>
+        </div>
       </div>
 
-      <!-- Upgrade-Liste -->
-      <div class="space-y-3">
+      <!-- Scrollbarer Inhalt: Upgrades -->
+      <div id="shop-content-upgrades" class="space-y-2.5 overflow-y-auto pr-1 flex-1">
         <!-- Upgrade 1: Greifkraft -->
-        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
           <div class="flex-1">
             <div class="flex items-center gap-2">
               <h3 class="font-bold text-sm text-amber-300">💪 Greifkraft</h3>
@@ -409,13 +452,13 @@
             </div>
             <p class="text-xs text-slate-400 mt-0.5">Erhöht Tragkraft-Limit (<span id="stat-grip">1.5</span> kg)</p>
           </div>
-          <button id="buy-grip" class="bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:pointer-events-none active:scale-95 transition text-white font-bold text-xs px-3.5 py-2.5 rounded-xl border border-amber-400/60 flex items-center gap-1 shadow-md">
+          <button id="buy-grip" class="bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:pointer-events-none active:scale-95 transition text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-amber-400/60 flex items-center gap-1 shadow-md">
             <span id="cost-grip">150</span> 🪙
           </button>
         </div>
 
         <!-- Upgrade 2: Motor-Geschwindigkeit -->
-        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
           <div class="flex-1">
             <div class="flex items-center gap-2">
               <h3 class="font-bold text-sm text-cyan-300">⚡ Motor-Tempo</h3>
@@ -425,13 +468,13 @@
             </div>
             <p class="text-xs text-slate-400 mt-0.5">Greifer fährt & senkt +25% schneller</p>
           </div>
-          <button id="buy-speed" class="bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 disabled:pointer-events-none active:scale-95 transition text-white font-bold text-xs px-3.5 py-2.5 rounded-xl border border-cyan-400/60 flex items-center gap-1 shadow-md">
+          <button id="buy-speed" class="bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 disabled:pointer-events-none active:scale-95 transition text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-cyan-400/60 flex items-center gap-1 shadow-md">
             <span id="cost-speed">100</span> 🪙
           </button>
         </div>
 
         <!-- Upgrade 3: Kniff-Batterie -->
-        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3">
           <div class="flex-1">
             <div class="flex items-center gap-2">
               <h3 class="font-bold text-sm text-emerald-300">🔋 Kniff-Batterie</h3>
@@ -441,13 +484,50 @@
             </div>
             <p class="text-xs text-slate-400 mt-0.5">Regeneriert Quanten-Energie +30% schneller</p>
           </div>
-          <button id="buy-battery" class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none active:scale-95 transition text-white font-bold text-xs px-3.5 py-2.5 rounded-xl border border-emerald-400/60 flex items-center gap-1 shadow-md">
+          <button id="buy-battery" class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none active:scale-95 transition text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-emerald-400/60 flex items-center gap-1 shadow-md">
             <span id="cost-battery">120</span> 🪙
+          </button>
+        </div>
+
+        <!-- Upgrade 4 (NEU Phase 3): Ziel-Laser-Visier -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-purple-500/30 flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-sm text-purple-300">📡 Ziel-Laser-Visier</h3>
+              <span class="text-[11px] bg-purple-500/15 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">
+                Stufe <span id="lvl-laser">1</span>/3
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Stufe 2: Zeigt Schrumpf-Kegel • Stufe 3: Zeigt Magnet-Radius & Fang-Highlight</p>
+          </div>
+          <button id="buy-laser" class="bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:pointer-events-none active:scale-95 transition text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-purple-400/60 flex items-center gap-1 shadow-md">
+            <span id="cost-laser">140</span> 🪙
+          </button>
+        </div>
+
+        <!-- Upgrade 5 (NEU Phase 3): Krallen-Reibung -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-rose-500/30 flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-sm text-rose-300">🧲 Krallen-Reibung</h3>
+              <span class="text-[11px] bg-rose-500/15 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30">
+                Stufe <span id="lvl-friction">1</span>
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Senkt Abrutsch-Chance bei schweren Preisen & Kapseln um -20%/Stufe</p>
+          </div>
+          <button id="buy-friction" class="bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:pointer-events-none active:scale-95 transition text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-rose-400/60 flex items-center gap-1 shadow-md">
+            <span id="cost-friction">130</span> 🪙
           </button>
         </div>
       </div>
 
-      <div class="pt-1 flex justify-end">
+      <!-- Scrollbarer Inhalt: Greifarm-Skins -->
+      <div id="shop-content-skins" class="hidden space-y-2.5 overflow-y-auto pr-1 flex-1">
+        <!-- Wird dynamisch per JS befüllt -->
+      </div>
+
+      <div class="pt-1 flex justify-end shrink-0">
         <button id="btn-done-shop" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider border border-slate-600 transition">
           Zurück zum Automaten
         </button>
@@ -457,12 +537,7 @@
 
   <script>
     /**
-     * QUANTEN-GREIFARM ARCADE (Phase 2: Kombo, Spezial-Kerne & Hazards)
-     * Enthält:
-     * - Responsive HTML5 Canvas mit 2D-Kreisphysik, Auftrieb (Helium-Ballon) & Kollisionen
-     * - Kombo-Multiplikator (x1.0 bis x2.5)
-     * - Spezial-Objekte: Energie-Zelle, Stör-Mine (EMP) & Mysteriöse Quanten-Kapsel
-     * - Web Audio API Synthesizer (ohne externe Sound-Dateien)
+     * QUANTEN-GREIFARM ARCADE (Phase 3: Werkstatt-Erweiterung, Aufträge, Sammlungs-Sets & Skins)
      */
 
     // ==========================================
@@ -501,54 +576,41 @@
           gain.connect(this.ctx.destination);
           osc.start();
           osc.stop(this.ctx.currentTime + duration);
-        } catch (e) {
-          // Audio-Fallback falls Browser blockiert
-        }
+        } catch (e) {}
       }
 
-      playDrop() {
-        this.playTone(320, 'triangle', 0.25, 0.12, 140);
-      }
-
-      playGrab() {
-        this.playTone(180, 'square', 0.08, 0.08, 260);
-      }
-
-      playSlip() {
-        this.playTone(300, 'sawtooth', 0.3, 0.12, 95);
-      }
-
+      playDrop() { this.playTone(320, 'triangle', 0.25, 0.12, 140); }
+      playGrab() { this.playTone(180, 'square', 0.08, 0.08, 260); }
+      playSlip() { this.playTone(300, 'sawtooth', 0.3, 0.12, 95); }
       playMagnet() {
         this.playTone(140, 'sine', 0.45, 0.15, 420);
         setTimeout(() => this.playTone(280, 'triangle', 0.35, 0.1, 560), 60);
       }
-
-      playShrink() {
-        this.playTone(880, 'sawtooth', 0.35, 0.1, 220);
-      }
-
+      playShrink() { this.playTone(880, 'sawtooth', 0.35, 0.1, 220); }
       playStasis() {
         this.playTone(520, 'sine', 0.5, 0.14, 180);
         this.playTone(780, 'triangle', 0.5, 0.08, 260);
       }
-
       playWin() {
         const notes = [523.25, 659.25, 783.99, 1046.5];
         notes.forEach((n, idx) => {
           setTimeout(() => this.playTone(n, 'triangle', 0.22, 0.13), idx * 75);
         });
       }
-
+      playQuestDone() {
+        const notes = [587.33, 739.99, 880, 1174.66];
+        notes.forEach((n, idx) => {
+          setTimeout(() => this.playTone(n, 'sine', 0.24, 0.14), idx * 65);
+        });
+      }
       playUpgrade() {
         this.playTone(440, 'sine', 0.15, 0.12, 660);
         setTimeout(() => this.playTone(660, 'sine', 0.2, 0.12, 880), 90);
       }
-
       playEmp() {
         this.playTone(190, 'sawtooth', 0.45, 0.16, 55);
         setTimeout(() => this.playTone(140, 'square', 0.35, 0.14, 45), 90);
       }
-
       playEnergyCharge() {
         this.playTone(380, 'sine', 0.18, 0.13, 760);
         setTimeout(() => this.playTone(760, 'triangle', 0.22, 0.12, 1140), 80);
@@ -558,7 +620,7 @@
     const audio = new ArcadeAudio();
 
     // ==========================================
-    // 2. SPIEL-DATEN & PREIS-KATALOG
+    // 2. SPIEL-DATEN, SETS, SKINS & AUFTRÄGE
     // ==========================================
     const ITEM_TYPES = [
       {
@@ -570,6 +632,7 @@
         radius: 26,
         magnetic: false,
         buoyancy: 0,
+        category: 'plush',
         color: '#d97706',
         glow: 'rgba(217, 119, 6, 0.35)',
         collectible: true
@@ -582,7 +645,8 @@
         value: 50,
         radius: 24,
         magnetic: false,
-        buoyancy: -0.34, // Steigt nach oben!
+        buoyancy: -0.34,
+        category: 'plush',
         color: '#f43f5e',
         glow: 'rgba(244, 63, 94, 0.35)',
         collectible: true
@@ -596,6 +660,7 @@
         radius: 21,
         magnetic: false,
         buoyancy: 0,
+        category: 'plush',
         color: '#eab308',
         glow: 'rgba(234, 179, 8, 0.35)',
         collectible: true
@@ -609,6 +674,7 @@
         radius: 29,
         magnetic: false,
         buoyancy: 0,
+        category: 'quantum',
         color: '#a855f7',
         glow: 'rgba(168, 85, 247, 0.4)',
         collectible: true
@@ -622,6 +688,7 @@
         radius: 24,
         magnetic: true,
         buoyancy: 0,
+        category: 'treasure',
         color: '#22d3ee',
         glow: 'rgba(34, 211, 238, 0.55)',
         collectible: true
@@ -635,6 +702,7 @@
         radius: 27,
         magnetic: true,
         buoyancy: 0,
+        category: 'treasure',
         color: '#fbbf24',
         glow: 'rgba(251, 191, 36, 0.5)',
         collectible: true
@@ -648,15 +716,15 @@
         radius: 23,
         magnetic: false,
         buoyancy: 0,
-        slippery: 0.016, // Sehr glatt: erhöhte Abrutsch-Chance beim Transport
+        slippery: 0.016,
         special: 'capsule',
+        category: 'quantum',
         color: '#ec4899',
         glow: 'rgba(236, 72, 153, 0.5)',
         collectible: true
       }
     ];
 
-    // Spezial-Objekte & Hazards im Automaten (nicht Teil der Sammlungs-Checkliste)
     const SPECIAL_ENTITIES = [
       {
         id: 'energy_cell',
@@ -688,22 +756,156 @@
       }
     ];
 
+    // Sammlungs-Sets mit passiven Boni
+    const COLLECTION_SETS = [
+      {
+        id: 'plush_set',
+        name: 'Jahrmarkt-Klassiker',
+        icon: '🧸',
+        items: ['bear', 'balloon', 'duck'],
+        bonusDesc: '+20% Münzwert auf alle Klassiker',
+        color: 'amber'
+      },
+      {
+        id: 'treasure_set',
+        name: 'Schwere Schätze',
+        icon: '👑',
+        items: ['crystal', 'crown'],
+        bonusDesc: '+25% Münzwert auf Kristalle & Kronen',
+        color: 'cyan'
+      },
+      {
+        id: 'quantum_set',
+        name: 'Quanten-Anomalie',
+        icon: '👾',
+        items: ['alien', 'capsule'],
+        bonusDesc: '-5 Energiekosten pro Kniff (30 statt 35)',
+        color: 'purple'
+      }
+    ];
+
+    // Freischaltbare Greifarm-Skins
+    const CLAW_SKINS = [
+      {
+        id: 'cyber_cyan',
+        name: 'Standard Cyber-Cyan',
+        icon: '🦾',
+        cost: 0,
+        idleColor: '#22d3ee',
+        railColor: '#22d3ee',
+        desc: 'Werkseitige Standard-Legierung.'
+      },
+      {
+        id: 'retro_gold',
+        name: 'Retro-Gold VIP',
+        icon: '👑',
+        cost: 300,
+        idleColor: '#fbbf24',
+        railColor: '#f59e0b',
+        desc: 'Vergoldete Zangen mit edlem Schimmer.'
+      },
+      {
+        id: 'tesla_coil',
+        name: 'Tesla-Spule',
+        icon: '⚡',
+        cost: 450,
+        idleColor: '#c084fc',
+        railColor: '#a855f7',
+        desc: 'Violetter Hochspannungs-Greifer.'
+      },
+      {
+        id: 'plasma_blade',
+        name: 'Plasma-Klaue',
+        icon: '🔥',
+        cost: 600,
+        idleColor: '#fb7185',
+        railColor: '#f43f5e',
+        desc: 'Glühende Rubin-Plasma-Klingen.'
+      }
+    ];
+
+    // Vorlagen für dynamische Runden-Aufträge
+    const QUEST_TEMPLATES = [
+      {
+        type: 'catch_any',
+        title: 'Sammler-Fieber',
+        desc: 'Fange {target} beliebige Preise',
+        target: 3,
+        reward: 140,
+        icon: '🎯'
+      },
+      {
+        type: 'catch_item',
+        itemId: 'balloon',
+        title: 'Himmelsstürmer',
+        desc: 'Fange {target} Helium-Ballons',
+        target: 2,
+        reward: 180,
+        icon: '🎈'
+      },
+      {
+        type: 'catch_stasis',
+        title: 'Chronos-Meister',
+        desc: 'Fange {target} Preise während einer Zeit-Stasis',
+        target: 2,
+        reward: 240,
+        icon: '⏱️'
+      },
+      {
+        type: 'catch_shrunk',
+        title: 'Miniatur-Experte',
+        desc: 'Fange {target} geschrumpfte Objekte',
+        target: 2,
+        reward: 210,
+        icon: '🔬'
+      },
+      {
+        type: 'use_ability',
+        title: 'Quanten-Ingenieur',
+        desc: 'Setze {target}-mal einen Quanten-Kniff ein',
+        target: 3,
+        reward: 150,
+        icon: '⚡'
+      },
+      {
+        type: 'reach_combo',
+        title: 'Heißer Lauf',
+        desc: 'Erreiche einen Kombo-Multiplikator von x1.6',
+        target: 1,
+        reward: 220,
+        icon: '🔥'
+      },
+      {
+        type: 'catch_magnetic',
+        title: 'Schatzsucher',
+        desc: 'Fange {target} magnetische Objekte (💎/👑)',
+        target: 2,
+        reward: 260,
+        icon: '🧲'
+      }
+    ];
+
     const state = {
       coins: 150,
       energy: 100,
       maxEnergy: 100,
-      abilityCost: 35,
-      selectedAbility: 'magnet', // 'magnet' | 'shrink' | 'freeze'
+      selectedAbility: 'magnet',
       stasisFrames: 0,
       empFrames: 0,
       comboStreak: 0,
       comboMultiplier: 1.0,
       totalCaught: 0,
+      questsCompleted: 0,
       unlockedItems: new Set(),
+      unlockedSkins: new Set(['cyber_cyan']),
+      equippedSkin: 'cyber_cyan',
+      activeQuests: [],
       upgrades: {
         grip: { level: 1, cost: 150 },
         speed: { level: 1, cost: 100 },
-        battery: { level: 1, cost: 120 }
+        battery: { level: 1, cost: 120 },
+        laser: { level: 1, cost: 140, maxLevel: 3 },
+        friction: { level: 1, cost: 130 }
       },
       keys: {
         left: false,
@@ -718,7 +920,6 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Logische Spielfeld-Koordinaten (skalieren sauber auf jede Bildschirmgröße)
     const WORLD_W = 800;
     const WORLD_H = 600;
     const CHUTE_WIDTH = 135;
@@ -735,26 +936,102 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // Greifer-Objekt
     const claw = {
       x: WORLD_W * 0.5,
       y: RAIL_Y + 34,
       baseY: RAIL_Y + 34,
-      state: 'IDLE', // 'IDLE' | 'DROPPING' | 'GRABBING' | 'RISING' | 'RETURNING' | 'RELEASING'
-      clawAngle: 0.48, // Offen = 0.48 rad, Geschlossen = 0.08 rad
+      state: 'IDLE',
+      clawAngle: 0.48,
       grabbedItem: null,
       grabTimer: 0,
-      tension: 0, // 0 = entspannt, > 1 = Überlastung / Rutschgefahr
+      tension: 0,
       pulseRing: 0
     };
 
     let items = [];
     let particles = [];
-    let beams = []; // Visuelle Effekte für Magnet-Wellen & Schrumpf-Laser
+    let beams = [];
     let floatingTexts = [];
 
     // ==========================================
-    // 4. PARTIKEL & VISUELLE EFFEKTE (JUICE)
+    // 4. HILFSFUNKTIONEN: SETS, SKINS & AUFTRÄGE
+    // ==========================================
+    function isSetCompleted(setObj) {
+      return setObj.items.every(id => state.unlockedItems.has(id));
+    }
+
+    function getAbilityCost() {
+      const quantumSet = COLLECTION_SETS.find(s => s.id === 'quantum_set');
+      return isSetCompleted(quantumSet) ? 30 : 35;
+    }
+
+    function getEquippedSkinObj() {
+      return CLAW_SKINS.find(s => s.id === state.equippedSkin) || CLAW_SKINS[0];
+    }
+
+    function generateNewQuest() {
+      const usedTitles = new Set(state.activeQuests.map(q => q.title));
+      const pool = QUEST_TEMPLATES.filter(t => !usedTitles.has(t.title));
+      const tpl = pool[Math.floor(Math.random() * pool.length)] || QUEST_TEMPLATES[0];
+      return {
+        id: 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        type: tpl.type,
+        itemId: tpl.itemId || null,
+        title: tpl.title,
+        desc: tpl.desc.replace('{target}', tpl.target),
+        progress: 0,
+        target: tpl.target,
+        reward: tpl.reward,
+        icon: tpl.icon
+      };
+    }
+
+    function initQuests() {
+      state.activeQuests = [];
+      for (let i = 0; i < 3; i++) {
+        state.activeQuests.push(generateNewQuest());
+      }
+    }
+
+    function advanceQuestProgress(eventType, payload = {}) {
+      let anyUpdated = false;
+
+      for (let i = state.activeQuests.length - 1; i >= 0; i--) {
+        const q = state.activeQuests[i];
+        let matched = false;
+
+        if (q.type === 'catch_any' && eventType === 'catch') matched = true;
+        if (q.type === 'catch_item' && eventType === 'catch' && payload.itemId === q.itemId) matched = true;
+        if (q.type === 'catch_stasis' && eventType === 'catch' && payload.duringStasis) matched = true;
+        if (q.type === 'catch_shrunk' && eventType === 'catch' && payload.wasShrunk) matched = true;
+        if (q.type === 'catch_magnetic' && eventType === 'catch' && payload.isMagnetic) matched = true;
+        if (q.type === 'use_ability' && eventType === 'ability') matched = true;
+        if (q.type === 'reach_combo' && eventType === 'combo' && payload.multiplier >= 1.6) matched = true;
+
+        if (matched) {
+          q.progress = Math.min(q.target, q.progress + 1);
+          anyUpdated = true;
+
+          if (q.progress >= q.target) {
+            state.coins += q.reward;
+            state.questsCompleted++;
+            audio.playQuestDone();
+            showToast(`📋 Auftrag erfüllt: „${q.title}“ (+${q.reward} 🪙)!`, 'border-amber-400 text-amber-200');
+            addFloatingText(claw.x, claw.y + 25, `📋 +${q.reward} 🪙!`, '#fbbf24');
+            // Ersetze abgeschlossenen Auftrag durch einen neuen
+            state.activeQuests[i] = generateNewQuest();
+          }
+        }
+      }
+
+      if (anyUpdated) {
+        renderQuests();
+        updateHUD();
+      }
+    }
+
+    // ==========================================
+    // 5. PARTIKEL & VISUELLE EFFEKTE (JUICE)
     // ==========================================
     function spawnParticles(x, y, color, count = 12, speed = 3.5) {
       for (let i = 0; i < count; i++) {
@@ -785,12 +1062,11 @@
     }
 
     // ==========================================
-    // 5. GEGENSTÄNDE ERZEUGEN & NACHFÜLLEN
+    // 6. GEGENSTÄNDE ERZEUGEN & NACHFÜLLEN
     // ==========================================
     function spawnItem(forcedType = null) {
       let type = forcedType;
       if (!type) {
-        // 75% reguläre Preise (inkl. Quanten-Kapsel), 25% Spezial-Kerne (Energie-Zelle / Stör-Mine)
         if (Math.random() < 0.25) {
           type = SPECIAL_ENTITIES[Math.floor(Math.random() * SPECIAL_ENTITIES.length)];
         } else {
@@ -817,14 +1093,13 @@
 
     function refillMachine(count = 13) {
       for (let i = 0; i < count; i++) {
-        // Erste 7 garantieren alle Sammlungs-Objekte, danach gemischt inkl. Spezial-Objekten
         let type = null;
         if (i < ITEM_TYPES.length) {
           type = ITEM_TYPES[i];
         } else if (i === ITEM_TYPES.length) {
-          type = SPECIAL_ENTITIES[0]; // Mindestens 1 Energie-Zelle
+          type = SPECIAL_ENTITIES[0];
         } else if (i === ITEM_TYPES.length + 1) {
-          type = SPECIAL_ENTITIES[1]; // Mindestens 1 Stör-Mine
+          type = SPECIAL_ENTITIES[1];
         }
         spawnItem(type);
       }
@@ -847,7 +1122,7 @@
       claw.grabbedItem = null;
       claw.tension = 0;
       state.energy = 0;
-      state.empFrames = 240; // 4 Sekunden invertierte Steuerung
+      state.empFrames = 240;
       state.screenShake = 11;
       resetCombo('Kombo verloren!');
 
@@ -858,23 +1133,24 @@
     }
 
     // ==========================================
-    // 6. QUANTEN-FÄHIGKEITEN (DER KNIFF)
+    // 7. QUANTEN-FÄHIGKEITEN (DER KNIFF)
     // ==========================================
     function triggerQuantumAbility() {
-      if (state.energy < state.abilityCost) {
-        showToast('⚠️ Nicht genug Quanten-Energie (35 benötigt)!', 'border-rose-500 text-rose-200');
+      const cost = getAbilityCost();
+      if (state.energy < cost) {
+        showToast(`⚠️ Nicht genug Quanten-Energie (${cost} benötigt)!`, 'border-rose-500 text-rose-200');
         audio.playTone(130, 'sawtooth', 0.15, 0.08);
         return;
       }
 
-      state.energy -= state.abilityCost;
+      state.energy -= cost;
       claw.pulseRing = 1.0;
+      advanceQuestProgress('ability');
 
       if (state.selectedAbility === 'magnet') {
         audio.playMagnet();
         showToast('🧲 MAGNET-IMPULS! Metallische Schätze angezogen!', 'border-cyan-400 text-cyan-200');
 
-        // Visuelle Magnet-Welle
         beams.push({
           type: 'magnet',
           x: claw.x,
@@ -907,7 +1183,6 @@
         audio.playShrink();
         showToast('🔬 SCHRUMPF-STRAHL! Objekte verkleinert & halbes Gewicht!', 'border-emerald-400 text-emerald-200');
 
-        // Visueller Laser-Kegel unter dem Greifer
         beams.push({
           type: 'shrink',
           x: claw.x,
@@ -936,7 +1211,7 @@
         }
       } else if (state.selectedAbility === 'freeze') {
         audio.playStasis();
-        state.stasisFrames = 300; // Exakt 5 Sekunden bei 60 FPS
+        state.stasisFrames = 300;
         showToast('⏱️ ZEIT-STASIS! Alle Objekte für 5s eingefroren!', 'border-purple-400 text-purple-200');
         items.forEach(item => {
           if (item !== claw.grabbedItem) {
@@ -951,7 +1226,7 @@
     }
 
     // ==========================================
-    // 7. GREIFER-STEUERUNG & LOGIK
+    // 8. GREIFER-STEUERUNG & LOGIK
     // ==========================================
     function getGripLimit() {
       return +(1.0 + state.upgrades.grip.level * 0.5).toFixed(2);
@@ -963,6 +1238,11 @@
 
     function getBatteryMultiplier() {
       return 1 + (state.upgrades.battery.level - 1) * 0.30;
+    }
+
+    function getFrictionReduction() {
+      // Jede Stufe über 1 senkt die Abrutschwahrscheinlichkeit um 20% (bis max. 80%)
+      return Math.min(0.80, (state.upgrades.friction.level - 1) * 0.20);
     }
 
     function startClawDrop() {
@@ -979,7 +1259,6 @@
       const dropSpeed = 5.2 * spdMult;
       const riseSpeed = 4.0 * spdMult;
 
-      // Joystick-Visualisierung aktualisieren
       const stick = document.getElementById('joystick-stick');
       if (stick) {
         let tiltX = 0;
@@ -1008,7 +1287,6 @@
       } else if (claw.state === 'DROPPING') {
         claw.y += dropSpeed;
 
-        // Prüfen, ob ein Objekt berührt wird
         let hitItem = null;
         for (const item of items) {
           if (item.inChute) continue;
@@ -1025,12 +1303,10 @@
           audio.playGrab();
         }
       } else if (claw.state === 'GRABBING') {
-        // Zangen schließen sich
         claw.clawAngle += (0.08 - claw.clawAngle) * 0.25;
         claw.grabTimer--;
 
         if (claw.grabTimer <= 0) {
-          // Bestes Objekt im Greifbereich finden
           let closest = null;
           let minDist = 44;
           for (const item of items) {
@@ -1043,7 +1319,6 @@
           }
 
           if (closest) {
-            // Spezial-Interaktion beim Greifen prüfen
             if (closest.type.special === 'hazard') {
               triggerEmpHazard(closest);
               claw.state = 'RISING';
@@ -1067,7 +1342,6 @@
             closest.vy = 0;
             spawnParticles(closest.x, closest.y, '#34d399', 8, 2.5);
           } else {
-            // Fehlschlag (ins Leere gegriffen) setzt Kombo zurück
             resetCombo('Fehlschlag! Kombo x1.0');
           }
           claw.state = 'RISING';
@@ -1111,7 +1385,6 @@
         return;
       }
 
-      // Objekt hängt mittig unter der Kralle
       item.x = claw.x;
       item.y = claw.y + 24 + item.radius * 0.35;
       item.vx = 0;
@@ -1122,29 +1395,28 @@
       const slipBonus = item.type.slippery || 0;
       claw.tension = Math.max(baseTension, slipBonus > 0 ? 0.85 : 0);
 
-      // Ist das Objekt schwerer als die aktuelle Greifkraft ODER extrem glatt (Quanten-Kapsel)?
       if (item.weight > limit || slipBonus > 0) {
-        // Visuelle Funken bei Überlastung / Rutschgefahr
-        if (Math.random() < 0.25) {
+        if (Math.random() < 0.22) {
           spawnParticles(claw.x + (Math.random() - 0.5) * 20, claw.y + 18, slipBonus > 0 ? '#f472b6' : '#f87171', 2, 2);
         }
 
         const overload = Math.max(0, item.weight - limit);
-        const slipChance = (overload > 0 ? 0.008 + overload * 0.016 : 0) + slipBonus;
-        if (Math.random() < slipChance) {
-          // Abgerutscht!
+        const rawSlipChance = (overload > 0 ? 0.008 + overload * 0.016 : 0) + slipBonus;
+        const effectiveSlipChance = rawSlipChance * (1 - getFrictionReduction());
+
+        if (Math.random() < effectiveSlipChance) {
           item.vx = (Math.random() - 0.5) * 3;
           item.vy = 2.0;
           claw.grabbedItem = null;
           claw.tension = 0;
           audio.playSlip();
           resetCombo('Abgerutscht! Kombo x1.0');
-          const reasonMsg = slipBonus > 0 ? 'Kapsel zu glatt! Zeit-Stasis hilft!' : 'Zu schwer! Abgerutscht!';
+          const reasonMsg = slipBonus > 0 ? 'Kapsel zu glatt! Krallen-Reibung hilft!' : 'Zu schwer! Abgerutscht!';
           addFloatingText(claw.x, claw.y + 45, reasonMsg, '#f87171');
           showToast(
             slipBonus > 0
-              ? '🎁 Die Quanten-Kapsel ist extrem glatt! Nutze Zeit-Stasis oder Schrumpf-Strahl!'
-              : '💥 Zu schwer! Verbessere die Greifkraft oder nutze den Schrumpf-Strahl!',
+              ? '🎁 Die Quanten-Kapsel ist extrem glatt! Verbessere Krallen-Reibung oder nutze Zeit-Stasis!'
+              : '💥 Zu schwer! Verbessere Greifkraft/Reibung oder nutze den Schrumpf-Strahl!',
             'border-amber-500 text-amber-200'
           );
         }
@@ -1152,15 +1424,13 @@
     }
 
     // ==========================================
-    // 8. 2D-KREISPHYSIK & KOLLISIONEN
+    // 9. 2D-KREISPHYSIK & KOLLISIONEN
     // ==========================================
     function updatePhysics() {
-      // Passive Energie-Regeneration
       if (state.energy < state.maxEnergy) {
         state.energy = Math.min(state.maxEnergy, state.energy + 0.085 * getBatteryMultiplier());
       }
 
-      // EMP-Störung Countdown
       if (state.empFrames > 0) {
         state.empFrames--;
         const empBanner = document.getElementById('emp-banner');
@@ -1171,7 +1441,6 @@
         document.getElementById('emp-banner').classList.add('hidden');
       }
 
-      // Stasis-Countdown
       if (state.stasisFrames > 0) {
         state.stasisFrames--;
         const banner = document.getElementById('stasis-banner');
@@ -1189,27 +1458,21 @@
         if (item === claw.grabbedItem) continue;
 
         if (!frozen) {
-          // Schwerkraft oder Helium-Auftrieb
           const gravity = item.type.buoyancy !== 0 ? item.type.buoyancy : 0.36;
           item.vy += gravity;
-
-          // Luftwiderstand / Dämpfung
           item.vx *= 0.985;
           item.vy *= 0.985;
-
           item.x += item.vx;
           item.y += item.vy;
           item.rotation += item.vx * 0.015;
         }
 
-        // Decken-Kollision (wichtig für Helium-Ballons)
         const ceilingY = RAIL_Y + 26 + item.radius;
         if (item.y < ceilingY) {
           item.y = ceilingY;
           item.vy *= -0.45;
         }
 
-        // Linke & Rechte Außenwand
         if (item.x - item.radius < 12) {
           item.x = 12 + item.radius;
           item.vx *= -0.55;
@@ -1219,10 +1482,8 @@
           item.vx *= -0.55;
         }
 
-        // Trennwand des Auswurf-Schachts (links)
         const wallHalf = 7;
         if (item.y + item.radius > CHUTE_WALL_TOP) {
-          // Befindet sich das Objekt im Schacht?
           if (item.x < CHUTE_WALL_X - wallHalf) {
             item.inChute = true;
           } else if (item.x - item.radius < CHUTE_WALL_X + wallHalf && !item.inChute) {
@@ -1231,7 +1492,6 @@
           }
         }
 
-        // Boden-Kollision (rechts vom Schacht)
         if (!item.inChute && item.y + item.radius > FLOOR_Y) {
           if (item.vy > 4.5 && item.weight >= 1.5) {
             state.screenShake = 5;
@@ -1241,7 +1501,6 @@
           item.vx *= 0.88;
         }
 
-        // Gewinn-Auslösung im Auswurf-Schacht
         if (item.inChute && item.y > WORLD_H - 35) {
           collectPrize(item);
           items.splice(i, 1);
@@ -1249,7 +1508,6 @@
         }
       }
 
-      // Gegenseitige Kreis-Kollisionsabstoßung
       for (let i = 0; i < items.length; i++) {
         for (let j = i + 1; j < items.length; j++) {
           const a = items[i];
@@ -1287,13 +1545,11 @@
         }
       }
 
-      // Automatisch nachfüllen, wenn weniger als 8 Objekte übrig sind
       if (items.length < 8) {
         refillMachine(7);
         showToast('📦 Neue Preis-Ladung im Automaten eingetroffen!', 'border-indigo-400 text-indigo-200');
       }
 
-      // Partikel & Strahlen aktualisieren
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
@@ -1321,15 +1577,23 @@
     }
 
     // ==========================================
-    // 9. GEWINN-VERARBEITUNG & UI-UPDATES
+    // 10. GEWINN-VERARBEITUNG & UI-UPDATES
     // ==========================================
     function collectPrize(item) {
-      // Kombo-Multiplikator erhöhen (+0.2x pro Fang in Folge, max 2.5x)
       state.comboStreak++;
       state.comboMultiplier = Math.min(2.5, +(1.0 + (state.comboStreak - 1) * 0.2).toFixed(1));
 
       let baseReward = item.type.value;
       let bonusText = '';
+
+      // Passive Set-Boni auf Münzwert anwenden
+      const plushSet = COLLECTION_SETS.find(s => s.id === 'plush_set');
+      const treasureSet = COLLECTION_SETS.find(s => s.id === 'treasure_set');
+      if (item.type.category === 'plush' && isSetCompleted(plushSet)) {
+        baseReward = Math.round(baseReward * 1.2);
+      } else if (item.type.category === 'treasure' && isSetCompleted(treasureSet)) {
+        baseReward = Math.round(baseReward * 1.25);
+      }
 
       // Zufalls-Loot für mysteriöse Quanten-Kapsel
       if (item.type.special === 'capsule') {
@@ -1341,7 +1605,6 @@
           state.energy = state.maxEnergy;
           bonusText = ' (+100% Energie!)';
         } else {
-          // Schaltet sofort ein zufälliges noch fehlendes Sammlungs-Item frei
           const locked = ITEM_TYPES.filter(t => !state.unlockedItems.has(t.id));
           if (locked.length > 0) {
             const gift = locked[Math.floor(Math.random() * locked.length)];
@@ -1358,13 +1621,17 @@
       state.coins += finalCoins;
       state.totalCaught++;
 
+      // Prüfen, ob ein neues Sammlungs-Set vervollständigt wurde
+      const completedBefore = COLLECTION_SETS.filter(s => isSetCompleted(s)).map(s => s.id);
+
       const isNew = item.type.collectible && !state.unlockedItems.has(item.type.id);
       if (item.type.collectible) {
         state.unlockedItems.add(item.type.id);
       }
 
+      const newlyCompletedSet = COLLECTION_SETS.find(s => isSetCompleted(s) && !completedBefore.includes(s.id));
+
       audio.playWin();
-      // Tonhöhe steigt leicht mit der Kombo-Serie
       if (state.comboStreak > 1) {
         setTimeout(() => audio.playTone(580 + state.comboStreak * 65, 'sine', 0.2, 0.12), 180);
       }
@@ -1375,20 +1642,35 @@
 
       // Auswurf-Schacht Schaukasten aktualisieren
       const dropZone = document.getElementById('prize-drop-zone');
-      dropZone.className = 'w-full min-h-[116px] bg-gradient-to-b from-emerald-950/50 to-slate-900 rounded-xl border-2 border-emerald-500/60 flex flex-col items-center justify-center p-3 relative overflow-hidden transition-all';
+      dropZone.className = 'w-full min-h-[104px] bg-gradient-to-b from-emerald-950/50 to-slate-900 rounded-xl border-2 border-emerald-500/60 flex flex-col items-center justify-center p-2.5 relative overflow-hidden transition-all';
       dropZone.innerHTML = `
         <div class="animate-pop flex flex-col items-center">
-          <div class="text-4xl mb-1 drop-shadow-lg">${item.type.emoji}</div>
-          <div class="text-sm font-bold text-white flex items-center gap-1.5">
+          <div class="text-3xl mb-0.5 drop-shadow-lg">${item.type.emoji}</div>
+          <div class="text-xs font-bold text-white flex items-center gap-1.5">
             <span>${item.type.name}</span>
-            ${isNew ? '<span class="text-[10px] bg-purple-600 text-white px-1.5 py-0.5 rounded uppercase">NEU!</span>' : ''}
+            ${isNew ? '<span class="text-[9px] bg-purple-600 text-white px-1.5 py-0.5 rounded uppercase">NEU!</span>' : ''}
           </div>
-          <div class="text-xs font-bold text-amber-300 mt-0.5">+${finalCoins} 🪙${comboLabel}${bonusText}</div>
+          <div class="text-[11px] font-bold text-amber-300 mt-0.5">+${finalCoins} 🪙${comboLabel}${bonusText}</div>
         </div>
       `;
 
-      showToast(`🎉 ${item.type.name} gefangen! +${finalCoins} 🪙${comboLabel}${bonusText}`, 'border-emerald-400 text-emerald-200');
+      if (newlyCompletedSet) {
+        showToast(`✨ SET KOMPLETT: ${newlyCompletedSet.name}! (${newlyCompletedSet.bonusDesc})`, 'border-purple-400 text-purple-200');
+      } else {
+        showToast(`🎉 ${item.type.name} gefangen! +${finalCoins} 🪙${comboLabel}${bonusText}`, 'border-emerald-400 text-emerald-200');
+      }
+
+      // Auftrags-Fortschritt melden
+      advanceQuestProgress('catch', {
+        itemId: item.type.id,
+        duringStasis: state.stasisFrames > 0,
+        wasShrunk: item.shrunk,
+        isMagnetic: item.type.magnetic
+      });
+      advanceQuestProgress('combo', { multiplier: state.comboMultiplier });
+
       renderCollection();
+      renderSets();
       updateHUD();
     }
 
@@ -1408,9 +1690,14 @@
       document.getElementById('coin-display').textContent = state.coins;
       document.getElementById('shop-coin-display').textContent = state.coins;
       document.getElementById('total-caught-badge').textContent = `Gefangen: ${state.totalCaught}`;
-      document.getElementById('telemetry-grip-limit').textContent = `Max. Tragkraft: ${getGripLimit()} kg`;
+      document.getElementById('telemetry-grip-limit').textContent = `Tragkraft: ${getGripLimit()} kg`;
+      document.getElementById('telemetry-friction').textContent = `+${Math.round(getFrictionReduction() * 100)}%`;
+      document.getElementById('telemetry-laser').textContent = `Stufe ${state.upgrades.laser.level}`;
 
-      // Kombo-Anzeige aktualisieren
+      const cost = getAbilityCost();
+      const triggerSub = document.querySelector('#btn-trigger-ability div div:last-child');
+      if (triggerSub) triggerSub.textContent = `${cost} Energie [E]`;
+
       const comboDisp = document.getElementById('combo-display');
       const comboBadge = document.getElementById('combo-badge');
       comboDisp.textContent = `x${state.comboMultiplier.toFixed(1)}`;
@@ -1430,21 +1717,58 @@
       bar.style.width = `${pct}%`;
       document.getElementById('energy-text').textContent = `${pct}%`;
 
-      if (state.energy < state.abilityCost) {
+      if (state.energy < cost) {
         bar.className = 'h-full rounded-full bg-gradient-to-r from-rose-500 to-amber-500 transition-all duration-100';
       } else {
         bar.className = 'h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-emerald-400 transition-all duration-100';
       }
 
-      // Shop Buttons aktualisieren
-      ['grip', 'speed', 'battery'].forEach(key => {
+      ['grip', 'speed', 'battery', 'laser', 'friction'].forEach(key => {
         const upg = state.upgrades[key];
         document.getElementById(`lvl-${key}`).textContent = upg.level;
-        document.getElementById(`cost-${key}`).textContent = upg.cost;
         const btn = document.getElementById(`buy-${key}`);
-        btn.disabled = state.coins < upg.cost;
+        if (upg.maxLevel && upg.level >= upg.maxLevel) {
+          btn.innerHTML = 'MAX';
+          btn.disabled = true;
+        } else {
+          document.getElementById(`cost-${key}`).textContent = upg.cost;
+          btn.disabled = state.coins < upg.cost;
+        }
       });
       document.getElementById('stat-grip').textContent = getGripLimit();
+    }
+
+    function renderQuests() {
+      const list = document.getElementById('quests-list');
+      list.innerHTML = '';
+      document.getElementById('quests-completed-badge').textContent = `Abgeschlossen: ${state.questsCompleted}`;
+
+      state.activeQuests.forEach(q => {
+        const pct = Math.min(100, Math.round((q.progress / q.target) * 100));
+        const card = document.createElement('div');
+        card.className = 'bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 space-y-1.5';
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">${q.icon}</span>
+              <div>
+                <div class="text-xs font-bold text-slate-100">${q.title}</div>
+                <div class="text-[11px] text-slate-400">${q.desc}</div>
+              </div>
+            </div>
+            <span class="text-[11px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md shrink-0">
+              +${q.reward} 🪙
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="flex-1 h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div class="h-full bg-gradient-to-r from-cyan-500 to-purple-500 transition-all duration-200" style="width: ${pct}%"></div>
+            </div>
+            <span class="text-[10px] font-bold text-slate-300">${q.progress}/${q.target}</span>
+          </div>
+        `;
+        list.appendChild(card);
+      });
     }
 
     function renderCollection() {
@@ -1456,19 +1780,19 @@
         const unlocked = state.unlockedItems.has(type.id);
         const card = document.createElement('div');
         card.className = unlocked
-          ? 'bg-slate-950/90 border border-purple-500/40 rounded-xl p-2.5 flex items-center gap-2.5 shadow-sm'
-          : 'bg-slate-950/50 border border-slate-800/80 rounded-xl p-2.5 flex items-center gap-2.5 opacity-60';
+          ? 'bg-slate-950/90 border border-purple-500/40 rounded-xl p-2 flex items-center gap-2 shadow-sm'
+          : 'bg-slate-950/50 border border-slate-800/80 rounded-xl p-2 flex items-center gap-2 opacity-60';
 
         card.innerHTML = `
-          <div class="w-10 h-10 rounded-lg ${unlocked ? 'bg-slate-900 border border-slate-700' : 'bg-slate-900/50'} flex items-center justify-center text-2xl shrink-0">
+          <div class="w-9 h-9 rounded-lg ${unlocked ? 'bg-slate-900 border border-slate-700' : 'bg-slate-900/50'} flex items-center justify-center text-xl shrink-0">
             ${unlocked ? type.emoji : '❓'}
           </div>
           <div class="min-w-0 flex-1">
             <div class="text-xs font-bold truncate ${unlocked ? 'text-slate-100' : 'text-slate-500'}">
               ${unlocked ? type.name : 'Unbekannt'}
             </div>
-            <div class="flex items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
-              <span>⚖️ ${type.weight}kg</span>
+            <div class="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+              <span>⚖️${type.weight}kg</span>
               <span>•</span>
               <span class="text-amber-400">${type.value}🪙</span>
               ${type.magnetic ? '<span title="Magnetisch">🧲</span>' : ''}
@@ -1479,8 +1803,106 @@
       });
     }
 
+    function renderSets() {
+      const list = document.getElementById('sets-list');
+      list.innerHTML = '';
+      let completedCount = 0;
+
+      COLLECTION_SETS.forEach(setObj => {
+        const done = isSetCompleted(setObj);
+        if (done) completedCount++;
+
+        const iconsHtml = setObj.items.map(id => {
+          const itemDef = ITEM_TYPES.find(t => t.id === id);
+          const has = state.unlockedItems.has(id);
+          return `<span class="w-6 h-6 rounded-md flex items-center justify-center text-sm ${has ? 'bg-slate-800 border border-emerald-500/50' : 'bg-slate-900/60 opacity-35 grayscale'}">${itemDef ? itemDef.emoji : '❓'}</span>`;
+        }).join('');
+
+        const card = document.createElement('div');
+        card.className = done
+          ? 'bg-emerald-950/25 border border-emerald-500/50 rounded-xl p-2.5 space-y-1.5'
+          : 'bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 space-y-1.5';
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold ${done ? 'text-emerald-300' : 'text-slate-200'}">${setObj.icon} ${setObj.name}</span>
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${done ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'}">
+              ${done ? 'AKTIV' : 'GESPERRT'}
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5">${iconsHtml}</div>
+          <p class="text-[11px] ${done ? 'text-emerald-200' : 'text-slate-400'}">${setObj.bonusDesc}</p>
+        `;
+        list.appendChild(card);
+      });
+
+      document.getElementById('sets-unlocked-badge').textContent = `${completedCount} / ${COLLECTION_SETS.length} Sets`;
+    }
+
+    function renderSkinsShop() {
+      const container = document.getElementById('shop-content-skins');
+      container.innerHTML = '';
+
+      CLAW_SKINS.forEach(skin => {
+        const owned = state.unlockedSkins.has(skin.id);
+        const equipped = state.equippedSkin === skin.id;
+
+        const card = document.createElement('div');
+        card.className = equipped
+          ? 'bg-purple-950/30 p-3 rounded-xl border border-purple-400 flex items-center justify-between gap-3'
+          : 'bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3';
+
+        let btnHtml = '';
+        if (equipped) {
+          btnHtml = `<span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-600/30 text-purple-200 border border-purple-400/50">AUSGERÜSTET</span>`;
+        } else if (owned) {
+          btnHtml = `<button data-skin-equip="${skin.id}" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-slate-600 transition">Ausrüsten</button>`;
+        } else {
+          const canAfford = state.coins >= skin.cost;
+          btnHtml = `<button data-skin-buy="${skin.id}" ${canAfford ? '' : 'disabled'} class="bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-amber-400/60 transition">${skin.cost} 🪙</button>`;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center gap-2.5 flex-1">
+            <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-xl" style="box-shadow: 0 0 12px ${skin.idleColor}44">
+              ${skin.icon}
+            </div>
+            <div>
+              <h3 class="font-bold text-sm" style="color: ${skin.idleColor}">${skin.name}</h3>
+              <p class="text-xs text-slate-400">${skin.desc}</p>
+            </div>
+          </div>
+          ${btnHtml}
+        `;
+        container.appendChild(card);
+      });
+
+      container.querySelectorAll('[data-skin-buy]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.skinBuy;
+          const skin = CLAW_SKINS.find(s => s.id === id);
+          if (!skin || state.coins < skin.cost) return;
+          state.coins -= skin.cost;
+          state.unlockedSkins.add(id);
+          state.equippedSkin = id;
+          audio.playUpgrade();
+          showToast(`🎨 Skin „${skin.name}“ freigeschaltet & ausgerüstet!`, 'border-purple-400 text-purple-200');
+          updateHUD();
+          renderSkinsShop();
+        });
+      });
+
+      container.querySelectorAll('[data-skin-equip]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.equippedSkin = btn.dataset.skinEquip;
+          audio.playTone(580, 'sine', 0.1, 0.08);
+          renderSkinsShop();
+        });
+      });
+    }
+
     // ==========================================
-    // 10. CANVAS RENDERING (DIEGETIC UI & VFX)
+    // 11. CANVAS RENDERING (DIEGETIC UI, LASER-VISIER & VFX)
     // ==========================================
     function drawScene() {
       ctx.save();
@@ -1488,14 +1910,12 @@
       const scaleY = canvas.height / WORLD_H;
       ctx.scale(scaleX, scaleY);
 
-      // Subtiler Screen-Shake
       if (state.screenShake > 0) {
         const sx = (Math.random() - 0.5) * state.screenShake * 2;
         const sy = (Math.random() - 0.5) * state.screenShake * 2;
         ctx.translate(sx, sy);
       }
 
-      // Hintergrund & Sci-Fi Raster
       const bgGrad = ctx.createLinearGradient(0, 0, 0, WORLD_H);
       bgGrad.addColorStop(0, '#090d1a');
       bgGrad.addColorStop(0.6, '#0f1629');
@@ -1503,7 +1923,6 @@
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
-      // Dezentes Neon-Gitter im Hintergrund
       ctx.strokeStyle = 'rgba(56, 189, 248, 0.05)';
       ctx.lineWidth = 1;
       for (let gx = 40; gx < WORLD_W; gx += 40) {
@@ -1523,7 +1942,6 @@
       ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
       ctx.fillRect(10, CHUTE_WALL_TOP, CHUTE_WALL_X - 10, WORLD_H - CHUTE_WALL_TOP - 10);
 
-      // Schacht-Beschriftung
       ctx.save();
       ctx.fillStyle = 'rgba(52, 211, 153, 0.45)';
       ctx.font = 'bold 12px Rajdhani, sans-serif';
@@ -1532,7 +1950,6 @@
       ctx.fillText('▼', CHUTE_WIDTH * 0.5, CHUTE_WALL_TOP + 46);
       ctx.restore();
 
-      // Schacht-Trennwand (Glas/Neon-Barriere)
       ctx.fillStyle = '#1e293b';
       ctx.strokeStyle = '#38bdf8';
       ctx.lineWidth = 2;
@@ -1541,7 +1958,6 @@
       ctx.fill();
       ctx.stroke();
 
-      // Bodenplatte rechts vom Schacht
       ctx.fillStyle = '#1e293b';
       ctx.fillRect(CHUTE_WALL_X, FLOOR_Y, WORLD_W - CHUTE_WALL_X - 10, 12);
       ctx.strokeStyle = 'rgba(139, 92, 246, 0.5)';
@@ -1550,11 +1966,14 @@
       ctx.lineTo(WORLD_W - 10, FLOOR_Y);
       ctx.stroke();
 
-      // Diegetic Ziel-Laser (wenn Greifer in IDLE Position)
+      const skin = getEquippedSkinObj();
+      const laserLevel = state.upgrades.laser.level;
+
+      // Diegetic Ziel-Laser & Upgrade-Vorschau (wenn Greifer in IDLE Position)
       if (claw.state === 'IDLE') {
         const laserGrad = ctx.createLinearGradient(0, claw.y + 20, 0, FLOOR_Y);
-        laserGrad.addColorStop(0, 'rgba(34, 211, 238, 0.35)');
-        laserGrad.addColorStop(1, 'rgba(34, 211, 238, 0.02)');
+        laserGrad.addColorStop(0, 'rgba(34, 211, 238, 0.4)');
+        laserGrad.addColorStop(1, 'rgba(34, 211, 238, 0.03)');
         ctx.save();
         ctx.strokeStyle = laserGrad;
         ctx.lineWidth = 2;
@@ -1563,6 +1982,27 @@
         ctx.moveTo(claw.x, claw.y + 24);
         ctx.lineTo(claw.x, FLOOR_Y);
         ctx.stroke();
+
+        // Ziel-Laser Stufe 2+: Schrumpf-Kegel-Vorschau
+        if (laserLevel >= 2 && state.selectedAbility === 'shrink') {
+          ctx.strokeStyle = 'rgba(16, 185, 129, 0.22)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(claw.x - 16, claw.y + 20);
+          ctx.lineTo(claw.x - 95, FLOOR_Y);
+          ctx.moveTo(claw.x + 16, claw.y + 20);
+          ctx.lineTo(claw.x + 95, FLOOR_Y);
+          ctx.stroke();
+        }
+
+        // Ziel-Laser Stufe 3: Magnet-Radius-Vorschau
+        if (laserLevel >= 3 && state.selectedAbility === 'magnet') {
+          ctx.strokeStyle = 'rgba(34, 211, 238, 0.18)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(claw.x, claw.y + 18, 320, 0.15, Math.PI - 0.15);
+          ctx.stroke();
+        }
         ctx.restore();
       }
 
@@ -1601,25 +2041,25 @@
         ctx.translate(item.x, item.y);
         ctx.rotate(item.rotation);
 
-        // Äußerer Kapsel-Glow
+        // Ziel-Laser Stufe 3: Highlight auf anvisiertes Objekt direkt unter der Kralle
+        const isTargeted = laserLevel >= 3 && claw.state === 'IDLE' && !item.inChute && Math.abs(item.x - claw.x) < item.radius + 12;
+
         ctx.beginPath();
         ctx.arc(0, 0, item.radius, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
         ctx.fill();
-        ctx.lineWidth = item.shrunk ? 2.5 : 2;
-        ctx.strokeStyle = item.shrunk ? '#34d399' : item.type.color;
-        ctx.shadowColor = item.type.glow;
-        ctx.shadowBlur = 12;
+        ctx.lineWidth = isTargeted ? 3.5 : (item.shrunk ? 2.5 : 2);
+        ctx.strokeStyle = isTargeted ? '#ffffff' : (item.shrunk ? '#34d399' : item.type.color);
+        ctx.shadowColor = isTargeted ? '#22d3ee' : item.type.glow;
+        ctx.shadowBlur = isTargeted ? 18 : 12;
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // Emoji darstellen
         ctx.font = `${Math.round(item.radius * 1.28)}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(item.type.emoji, 0, 2);
 
-        // Magnet-Indikator Badge bei magnetischen Objekten
         if (item.type.magnetic) {
           ctx.fillStyle = '#0891b2';
           ctx.beginPath();
@@ -1630,7 +2070,6 @@
           ctx.fillText('M', item.radius * 0.68, -item.radius * 0.68 + 0.5);
         }
 
-        // Gefahren-Warnring um Stör-Minen
         if (item.type.special === 'hazard') {
           const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 140);
           ctx.strokeStyle = `rgba(244, 63, 94, ${0.4 + pulse * 0.6})`;
@@ -1645,13 +2084,11 @@
         ctx.restore();
       });
 
-      // Zeit-Stasis Kälte-Overlay
       if (state.stasisFrames > 0) {
         ctx.fillStyle = 'rgba(139, 92, 246, 0.14)';
         ctx.fillRect(0, RAIL_Y, WORLD_W, WORLD_H - RAIL_Y);
       }
 
-      // EMP-Störungs-Overlay (leichtes rotes Flimmern)
       if (state.empFrames > 0) {
         const flicker = 0.06 + 0.05 * Math.sin(Date.now() / 60);
         ctx.fillStyle = `rgba(244, 63, 94, ${flicker})`;
@@ -1673,20 +2110,19 @@
       ctx.lineTo(claw.x, claw.y);
       ctx.stroke();
 
-      // Laufkatze auf der Schiene
+      // Laufkatze auf der Schiene (mit Skin-Farbe)
       ctx.fillStyle = '#334155';
-      ctx.strokeStyle = '#22d3ee';
+      ctx.strokeStyle = skin.railColor;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.roundRect(claw.x - 22, RAIL_Y - 12, 44, 24, 6);
       ctx.fill();
       ctx.stroke();
 
-      // Greifer-Kopf & Diegetic UI (Energie-Ring & Spannungs-Farbe)
+      // Greifer-Kopf & Diegetic UI
       ctx.save();
       ctx.translate(claw.x, claw.y);
 
-      // Impuls-Ring bei Fähigkeits-Auslösung
       if (claw.pulseRing > 0) {
         ctx.strokeStyle = `rgba(34, 211, 238, ${claw.pulseRing})`;
         ctx.lineWidth = 3;
@@ -1695,8 +2131,7 @@
         ctx.stroke();
       }
 
-      // Krallen-Farbe anhand der Zugspannung (Grün = sicher, Gelb = knapp, Rot = rutscht!)
-      let clawColor = '#22d3ee';
+      let clawColor = skin.idleColor;
       if (claw.grabbedItem) {
         if (claw.tension > 1.0) {
           clawColor = Math.floor(Date.now() / 90) % 2 === 0 ? '#ef4444' : '#f97316';
@@ -1707,13 +2142,11 @@
         }
       }
 
-      // Linker & Rechter Greifarm-Finger
       ctx.strokeStyle = clawColor;
       ctx.lineWidth = 5;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      // Links
       ctx.save();
       ctx.rotate(claw.clawAngle);
       ctx.beginPath();
@@ -1723,7 +2156,6 @@
       ctx.stroke();
       ctx.restore();
 
-      // Rechts
       ctx.save();
       ctx.rotate(-claw.clawAngle);
       ctx.beginPath();
@@ -1733,7 +2165,6 @@
       ctx.stroke();
       ctx.restore();
 
-      // Greifer-Nabe
       ctx.fillStyle = '#0f172a';
       ctx.strokeStyle = clawColor;
       ctx.lineWidth = 3;
@@ -1742,9 +2173,9 @@
       ctx.fill();
       ctx.stroke();
 
-      // Diegetic Energie-Bogen direkt auf der Greifer-Nabe
+      const cost = getAbilityCost();
       const energyPct = state.energy / state.maxEnergy;
-      ctx.strokeStyle = energyPct >= 0.35 ? '#22d3ee' : '#f43f5e';
+      ctx.strokeStyle = state.energy >= cost ? '#22d3ee' : '#f43f5e';
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(0, 0, 9, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * energyPct);
@@ -1752,7 +2183,6 @@
 
       ctx.restore();
 
-      // Partikel zeichnen
       particles.forEach(p => {
         ctx.save();
         ctx.globalAlpha = Math.max(0, p.alpha);
@@ -1763,7 +2193,6 @@
         ctx.restore();
       });
 
-      // Schwebende Texte zeichnen
       floatingTexts.forEach(ft => {
         ctx.save();
         ctx.globalAlpha = Math.max(0, ft.alpha);
@@ -1780,7 +2209,7 @@
     }
 
     // ==========================================
-    // 11. HAUPTSCHLEIFE (GAME LOOP)
+    // 12. HAUPTSCHLEIFE (GAME LOOP)
     // ==========================================
     function gameLoop() {
       updateClaw();
@@ -1791,7 +2220,7 @@
     }
 
     // ==========================================
-    // 12. EVENT LISTENER & STEUERUNG
+    // 13. EVENT LISTENER & STEUERUNG
     // ==========================================
     function selectAbility(abilityKey) {
       state.selectedAbility = abilityKey;
@@ -1823,12 +2252,42 @@
       audio.playTone(520, 'sine', 0.08, 0.07);
     }
 
-    // Kniff-Buttons
     document.querySelectorAll('.ability-btn').forEach(btn => {
       btn.addEventListener('click', () => selectAbility(btn.dataset.ability));
     });
 
-    // Touch & Maus Halten für Links/Rechts
+    // Seitenleisten-Tabs (Aufträge / Katalog / Sets)
+    document.querySelectorAll('.side-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.side-tab-btn').forEach(b => {
+          b.className = 'side-tab-btn py-1.5 px-2 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 border border-transparent transition flex items-center justify-center gap-1';
+        });
+        btn.className = 'side-tab-btn py-1.5 px-2 rounded-lg text-xs font-bold bg-purple-600/30 text-purple-200 border border-purple-500/50 transition flex items-center justify-center gap-1';
+
+        ['quests', 'collection', 'sets'].forEach(panel => {
+          document.getElementById(`tab-panel-${panel}`).classList.toggle('hidden', panel !== target);
+        });
+      });
+    });
+
+    // Werkstatt-Tabs (Upgrades vs. Skins)
+    const tabUpgrades = document.getElementById('shop-tab-upgrades');
+    const tabSkins = document.getElementById('shop-tab-skins');
+    tabUpgrades.addEventListener('click', () => {
+      tabUpgrades.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white border border-indigo-400 transition';
+      tabSkins.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition';
+      document.getElementById('shop-content-upgrades').classList.remove('hidden');
+      document.getElementById('shop-content-skins').classList.add('hidden');
+    });
+    tabSkins.addEventListener('click', () => {
+      tabSkins.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white border border-indigo-400 transition';
+      tabUpgrades.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition';
+      document.getElementById('shop-content-skins').classList.remove('hidden');
+      document.getElementById('shop-content-upgrades').classList.add('hidden');
+      renderSkinsShop();
+    });
+
     function bindHoldButton(btnId, dirKey) {
       const btn = document.getElementById(btnId);
       const start = (e) => {
@@ -1854,7 +2313,6 @@
     document.getElementById('btn-drop').addEventListener('click', startClawDrop);
     document.getElementById('btn-trigger-ability').addEventListener('click', triggerQuantumAbility);
 
-    // Tastatursteuerung
     window.addEventListener('keydown', (e) => {
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
         state.keys.left = true;
@@ -1887,10 +2345,10 @@
       }
     });
 
-    // Shop Modal Steuerung
     const shopModal = document.getElementById('shop-modal');
     document.getElementById('btn-open-shop').addEventListener('click', () => {
       updateHUD();
+      renderSkinsShop();
       shopModal.classList.remove('hidden');
       shopModal.classList.add('flex');
     });
@@ -1904,6 +2362,7 @@
 
     function buyUpgrade(key, label) {
       const upg = state.upgrades[key];
+      if (upg.maxLevel && upg.level >= upg.maxLevel) return;
       if (state.coins < upg.cost) return;
       state.coins -= upg.cost;
       upg.level++;
@@ -1916,18 +2375,21 @@
     document.getElementById('buy-grip').addEventListener('click', () => buyUpgrade('grip', 'Greifkraft'));
     document.getElementById('buy-speed').addEventListener('click', () => buyUpgrade('speed', 'Motor-Tempo'));
     document.getElementById('buy-battery').addEventListener('click', () => buyUpgrade('battery', 'Kniff-Batterie'));
+    document.getElementById('buy-laser').addEventListener('click', () => buyUpgrade('laser', 'Ziel-Laser-Visier'));
+    document.getElementById('buy-friction').addEventListener('click', () => buyUpgrade('friction', 'Krallen-Reibung'));
 
-    // Audio Mute Toggle
     document.getElementById('btn-mute').addEventListener('click', (e) => {
       audio.muted = !audio.muted;
       e.currentTarget.textContent = audio.muted ? '🔇' : '🔊';
     });
 
-    // Initialisierung nach Laden des Fensters
     window.onload = function () {
       resizeCanvas();
       refillMachine(13);
+      initQuests();
+      renderQuests();
       renderCollection();
+      renderSets();
       updateHUD();
       gameLoop();
     };
