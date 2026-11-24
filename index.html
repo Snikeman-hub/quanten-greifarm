@@ -153,20 +153,26 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-lg sm:text-2xl font-bold tracking-wider text-purple-300 neon-text-purple">QUANTEN-GREIFARM</h1>
-            <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-              Phase 1 • Visual Edition
+            <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              Phase 2 • Kombo & Hazards
             </span>
           </div>
           <p class="text-xs text-slate-400">Manipuliere Schwerkraft, Masse & Zeit im Arcade-Automaten</p>
         </div>
       </div>
 
-      <!-- Rechte Aktionsleiste: Audio, Münzen, Shop -->
+      <!-- Rechte Aktionsleiste: Audio, Kombo, Münzen, Shop -->
       <div class="flex items-center gap-2 sm:gap-3">
         <!-- Sound Toggle -->
         <button id="btn-mute" title="Audio umschalten" class="w-9 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-600/70 flex items-center justify-center text-base transition active:scale-95">
           🔊
         </button>
+
+        <!-- Kombo-Multiplikator Badge -->
+        <div id="combo-badge" class="bg-slate-950/90 border border-purple-500/40 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner transition-all">
+          <span class="text-purple-400 text-sm">🔥</span>
+          <span id="combo-display" class="pixel-font text-purple-300 text-[11px] sm:text-xs">x1.0</span>
+        </div>
 
         <!-- Münzanzeige -->
         <div class="bg-slate-950/90 border border-amber-500/40 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-inner">
@@ -220,6 +226,13 @@
             <span class="text-sm">⏱️</span>
             <span class="text-xs font-bold tracking-wider text-purple-200">ZEIT-STASIS AKTIV</span>
             <span id="stasis-countdown" class="pixel-font text-[10px] text-cyan-300">5.0s</span>
+          </div>
+
+          <!-- EMP-Störung Banner (erscheint bei Stör-Minen-Kontakt) -->
+          <div id="emp-banner" class="hidden absolute top-24 left-1/2 -translate-x-1/2 bg-rose-950/95 backdrop-blur-md border border-rose-500 px-4 py-1 rounded-full flex items-center gap-2 shadow-lg pointer-events-none animate-pulse">
+            <span class="text-sm">⚠️</span>
+            <span class="text-xs font-bold tracking-wider text-rose-200">EMP-STÖRUNG! STEUERUNG INVERTIERT</span>
+            <span id="emp-countdown" class="pixel-font text-[10px] text-amber-300">4.0s</span>
           </div>
 
           <!-- Floating Feedback Toast -->
@@ -334,7 +347,7 @@
               <span>🏆</span> PREIS-KATALOG & SAMMLUNG
             </h2>
             <span id="collection-count" class="pixel-font text-[10px] bg-purple-950/80 border border-purple-500/40 px-2 py-1 rounded-lg text-purple-300">
-              0 / 6
+              0 / 7
             </span>
           </div>
 
@@ -349,8 +362,8 @@
             <span>📡 GREIFER-TELEMETRIE</span>
             <span id="telemetry-grip-limit" class="text-emerald-400">Max. Tragkraft: 1.5 kg</span>
           </div>
-          <p>• <b class="text-slate-300">Farb-Indikator an Kralle:</b> Grün = Sicher, Gelb = Grenzbereich, Rot = Rutschgefahr!</p>
-          <p>• <b class="text-slate-300">Magnet-Symbol (🧲):</b> Kristalle & Kronen werden vom Magnet-Impuls angezogen.</p>
+          <p>• <b class="text-amber-300">Kombo-Serie:</b> Jede erfolgreiche Ausbeute steigert den Münz-Multiplikator (+0.2x bis 2.5x). Fehlschläge setzen ihn zurück!</p>
+          <p>• <b class="text-cyan-300">Spezial-Kerne:</b> ⚡ Lädt 100% Energie • 💣 Löst EMP aus (mit Magnet wegräumen!) • 🎁 Glatte Kapsel mit Bonus-Loot.</p>
         </div>
 
       </aside>
@@ -444,11 +457,11 @@
 
   <script>
     /**
-     * QUANTEN-GREIFARM ARCADE (Phase 1: Visual & UI Polish + Core Physics & VFX)
+     * QUANTEN-GREIFARM ARCADE (Phase 2: Kombo, Spezial-Kerne & Hazards)
      * Enthält:
      * - Responsive HTML5 Canvas mit 2D-Kreisphysik, Auftrieb (Helium-Ballon) & Kollisionen
-     * - Diegetic UI am Greifer: Energie-Ladebogen, Ziel-Laser, Spannungs-Farbindikator & Funken
-     * - Partikel- und Shader-Effekte für Magnet-Impuls, Schrumpf-Strahl und Zeit-Stasis
+     * - Kombo-Multiplikator (x1.0 bis x2.5)
+     * - Spezial-Objekte: Energie-Zelle, Stör-Mine (EMP) & Mysteriöse Quanten-Kapsel
      * - Web Audio API Synthesizer (ohne externe Sound-Dateien)
      */
 
@@ -530,6 +543,16 @@
         this.playTone(440, 'sine', 0.15, 0.12, 660);
         setTimeout(() => this.playTone(660, 'sine', 0.2, 0.12, 880), 90);
       }
+
+      playEmp() {
+        this.playTone(190, 'sawtooth', 0.45, 0.16, 55);
+        setTimeout(() => this.playTone(140, 'square', 0.35, 0.14, 45), 90);
+      }
+
+      playEnergyCharge() {
+        this.playTone(380, 'sine', 0.18, 0.13, 760);
+        setTimeout(() => this.playTone(760, 'triangle', 0.22, 0.12, 1140), 80);
+      }
     }
 
     const audio = new ArcadeAudio();
@@ -548,7 +571,8 @@
         magnetic: false,
         buoyancy: 0,
         color: '#d97706',
-        glow: 'rgba(217, 119, 6, 0.35)'
+        glow: 'rgba(217, 119, 6, 0.35)',
+        collectible: true
       },
       {
         id: 'balloon',
@@ -560,7 +584,8 @@
         magnetic: false,
         buoyancy: -0.34, // Steigt nach oben!
         color: '#f43f5e',
-        glow: 'rgba(244, 63, 94, 0.35)'
+        glow: 'rgba(244, 63, 94, 0.35)',
+        collectible: true
       },
       {
         id: 'duck',
@@ -572,7 +597,8 @@
         magnetic: false,
         buoyancy: 0,
         color: '#eab308',
-        glow: 'rgba(234, 179, 8, 0.35)'
+        glow: 'rgba(234, 179, 8, 0.35)',
+        collectible: true
       },
       {
         id: 'alien',
@@ -584,7 +610,8 @@
         magnetic: false,
         buoyancy: 0,
         color: '#a855f7',
-        glow: 'rgba(168, 85, 247, 0.4)'
+        glow: 'rgba(168, 85, 247, 0.4)',
+        collectible: true
       },
       {
         id: 'crystal',
@@ -596,7 +623,8 @@
         magnetic: true,
         buoyancy: 0,
         color: '#22d3ee',
-        glow: 'rgba(34, 211, 238, 0.55)'
+        glow: 'rgba(34, 211, 238, 0.55)',
+        collectible: true
       },
       {
         id: 'crown',
@@ -608,7 +636,55 @@
         magnetic: true,
         buoyancy: 0,
         color: '#fbbf24',
-        glow: 'rgba(251, 191, 36, 0.5)'
+        glow: 'rgba(251, 191, 36, 0.5)',
+        collectible: true
+      },
+      {
+        id: 'capsule',
+        name: 'Quanten-Kapsel',
+        emoji: '🎁',
+        weight: 0.5,
+        value: 180,
+        radius: 23,
+        magnetic: false,
+        buoyancy: 0,
+        slippery: 0.016, // Sehr glatt: erhöhte Abrutsch-Chance beim Transport
+        special: 'capsule',
+        color: '#ec4899',
+        glow: 'rgba(236, 72, 153, 0.5)',
+        collectible: true
+      }
+    ];
+
+    // Spezial-Objekte & Hazards im Automaten (nicht Teil der Sammlungs-Checkliste)
+    const SPECIAL_ENTITIES = [
+      {
+        id: 'energy_cell',
+        name: 'Energie-Zelle',
+        emoji: '⚡',
+        weight: 0.4,
+        value: 40,
+        radius: 20,
+        magnetic: true,
+        buoyancy: 0,
+        special: 'energy',
+        color: '#38bdf8',
+        glow: 'rgba(56, 189, 248, 0.65)',
+        collectible: false
+      },
+      {
+        id: 'emp_mine',
+        name: 'Stör-Mine',
+        emoji: '💣',
+        weight: 1.8,
+        value: 0,
+        radius: 23,
+        magnetic: true,
+        buoyancy: 0,
+        special: 'hazard',
+        color: '#f43f5e',
+        glow: 'rgba(244, 63, 94, 0.6)',
+        collectible: false
       }
     ];
 
@@ -619,6 +695,9 @@
       abilityCost: 35,
       selectedAbility: 'magnet', // 'magnet' | 'shrink' | 'freeze'
       stasisFrames: 0,
+      empFrames: 0,
+      comboStreak: 0,
+      comboMultiplier: 1.0,
       totalCaught: 0,
       unlockedItems: new Set(),
       upgrades: {
@@ -709,7 +788,15 @@
     // 5. GEGENSTÄNDE ERZEUGEN & NACHFÜLLEN
     // ==========================================
     function spawnItem(forcedType = null) {
-      const type = forcedType || ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
+      let type = forcedType;
+      if (!type) {
+        // 75% reguläre Preise (inkl. Quanten-Kapsel), 25% Spezial-Kerne (Energie-Zelle / Stör-Mine)
+        if (Math.random() < 0.25) {
+          type = SPECIAL_ENTITIES[Math.floor(Math.random() * SPECIAL_ENTITIES.length)];
+        } else {
+          type = ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
+        }
+      }
       const spawnX = CHUTE_WALL_X + 55 + Math.random() * (WORLD_W - CHUTE_WALL_X - 110);
       const spawnY = type.buoyancy < 0 ? WORLD_H - 90 : 120 + Math.random() * 140;
 
@@ -728,12 +815,46 @@
       });
     }
 
-    function refillMachine(count = 12) {
+    function refillMachine(count = 13) {
       for (let i = 0; i < count; i++) {
-        // Erste 6 garantieren Vielfalt, danach zufällig
-        const type = i < ITEM_TYPES.length ? ITEM_TYPES[i] : null;
+        // Erste 7 garantieren alle Sammlungs-Objekte, danach gemischt inkl. Spezial-Objekten
+        let type = null;
+        if (i < ITEM_TYPES.length) {
+          type = ITEM_TYPES[i];
+        } else if (i === ITEM_TYPES.length) {
+          type = SPECIAL_ENTITIES[0]; // Mindestens 1 Energie-Zelle
+        } else if (i === ITEM_TYPES.length + 1) {
+          type = SPECIAL_ENTITIES[1]; // Mindestens 1 Stör-Mine
+        }
         spawnItem(type);
       }
+    }
+
+    function resetCombo(reason = null) {
+      if (state.comboStreak > 0) {
+        state.comboStreak = 0;
+        state.comboMultiplier = 1.0;
+        if (reason) {
+          addFloatingText(claw.x, claw.y + 62, reason, '#fb7185');
+        }
+      }
+    }
+
+    function triggerEmpHazard(mineItem) {
+      const idx = items.indexOf(mineItem);
+      if (idx !== -1) items.splice(idx, 1);
+
+      claw.grabbedItem = null;
+      claw.tension = 0;
+      state.energy = 0;
+      state.empFrames = 240; // 4 Sekunden invertierte Steuerung
+      state.screenShake = 11;
+      resetCombo('Kombo verloren!');
+
+      audio.playEmp();
+      spawnParticles(claw.x, claw.y + 20, '#f43f5e', 28, 5);
+      addFloatingText(claw.x, claw.y + 30, '💥 EMP! Energie 0% & Steuerung invertiert!', '#fda4af');
+      showToast('💣 STÖR-MINE DETONIERT! Steuerung für 4s invertiert!', 'border-rose-500 text-rose-200');
     }
 
     // ==========================================
@@ -864,6 +985,7 @@
         let tiltX = 0;
         if (state.keys.left) tiltX = -6;
         if (state.keys.right) tiltX = 6;
+        if (state.empFrames > 0) tiltX *= -1;
         stick.style.transform = `translateX(${tiltX}px)`;
       }
 
@@ -872,10 +994,14 @@
       }
 
       if (claw.state === 'IDLE') {
-        if (state.keys.left) {
+        const inverted = state.empFrames > 0;
+        const moveLeft = inverted ? state.keys.right : state.keys.left;
+        const moveRight = inverted ? state.keys.left : state.keys.right;
+
+        if (moveLeft) {
           claw.x = Math.max(CHUTE_WALL_X + 32, claw.x - moveSpeed);
         }
-        if (state.keys.right) {
+        if (moveRight) {
           claw.x = Math.min(WORLD_W - 42, claw.x + moveSpeed);
         }
         claw.clawAngle += (0.48 - claw.clawAngle) * 0.15;
@@ -917,10 +1043,32 @@
           }
 
           if (closest) {
+            // Spezial-Interaktion beim Greifen prüfen
+            if (closest.type.special === 'hazard') {
+              triggerEmpHazard(closest);
+              claw.state = 'RISING';
+              return;
+            }
+            if (closest.type.special === 'energy') {
+              const idx = items.indexOf(closest);
+              if (idx !== -1) items.splice(idx, 1);
+              state.energy = state.maxEnergy;
+              state.coins += closest.type.value;
+              audio.playEnergyCharge();
+              spawnParticles(closest.x, closest.y, '#38bdf8', 22, 4);
+              addFloatingText(closest.x, closest.y - 10, '⚡ ENERGIE 100% +40🪙!', '#7dd3fc');
+              showToast('⚡ Energie-Zelle absorbiert! Quanten-Energie auf 100%!', 'border-cyan-400 text-cyan-200');
+              claw.state = 'RISING';
+              return;
+            }
+
             claw.grabbedItem = closest;
             closest.vx = 0;
             closest.vy = 0;
             spawnParticles(closest.x, closest.y, '#34d399', 8, 2.5);
+          } else {
+            // Fehlschlag (ins Leere gegriffen) setzt Kombo zurück
+            resetCombo('Fehlschlag! Kombo x1.0');
           }
           claw.state = 'RISING';
         }
@@ -970,17 +1118,19 @@
       item.vy = 0;
 
       const limit = getGripLimit();
-      claw.tension = item.weight / limit;
+      const baseTension = item.weight / limit;
+      const slipBonus = item.type.slippery || 0;
+      claw.tension = Math.max(baseTension, slipBonus > 0 ? 0.85 : 0);
 
-      // Ist das Objekt schwerer als die aktuelle Greifkraft?
-      if (item.weight > limit) {
-        // Visuelle Funken bei Überlastung
+      // Ist das Objekt schwerer als die aktuelle Greifkraft ODER extrem glatt (Quanten-Kapsel)?
+      if (item.weight > limit || slipBonus > 0) {
+        // Visuelle Funken bei Überlastung / Rutschgefahr
         if (Math.random() < 0.25) {
-          spawnParticles(claw.x + (Math.random() - 0.5) * 20, claw.y + 18, '#f87171', 2, 2);
+          spawnParticles(claw.x + (Math.random() - 0.5) * 20, claw.y + 18, slipBonus > 0 ? '#f472b6' : '#f87171', 2, 2);
         }
 
-        const overload = item.weight - limit;
-        const slipChance = 0.008 + overload * 0.016;
+        const overload = Math.max(0, item.weight - limit);
+        const slipChance = (overload > 0 ? 0.008 + overload * 0.016 : 0) + slipBonus;
         if (Math.random() < slipChance) {
           // Abgerutscht!
           item.vx = (Math.random() - 0.5) * 3;
@@ -988,8 +1138,15 @@
           claw.grabbedItem = null;
           claw.tension = 0;
           audio.playSlip();
-          addFloatingText(claw.x, claw.y + 45, 'Zu schwer! Abgerutscht!', '#f87171');
-          showToast('💥 Zu schwer! Verbessere die Greifkraft oder nutze den Schrumpf-Strahl!', 'border-amber-500 text-amber-200');
+          resetCombo('Abgerutscht! Kombo x1.0');
+          const reasonMsg = slipBonus > 0 ? 'Kapsel zu glatt! Zeit-Stasis hilft!' : 'Zu schwer! Abgerutscht!';
+          addFloatingText(claw.x, claw.y + 45, reasonMsg, '#f87171');
+          showToast(
+            slipBonus > 0
+              ? '🎁 Die Quanten-Kapsel ist extrem glatt! Nutze Zeit-Stasis oder Schrumpf-Strahl!'
+              : '💥 Zu schwer! Verbessere die Greifkraft oder nutze den Schrumpf-Strahl!',
+            'border-amber-500 text-amber-200'
+          );
         }
       }
     }
@@ -1001,6 +1158,17 @@
       // Passive Energie-Regeneration
       if (state.energy < state.maxEnergy) {
         state.energy = Math.min(state.maxEnergy, state.energy + 0.085 * getBatteryMultiplier());
+      }
+
+      // EMP-Störung Countdown
+      if (state.empFrames > 0) {
+        state.empFrames--;
+        const empBanner = document.getElementById('emp-banner');
+        const empCd = document.getElementById('emp-countdown');
+        empBanner.classList.remove('hidden');
+        empCd.textContent = (state.empFrames / 60).toFixed(1) + 's';
+      } else {
+        document.getElementById('emp-banner').classList.add('hidden');
       }
 
       // Stasis-Countdown
@@ -1121,7 +1289,7 @@
 
       // Automatisch nachfüllen, wenn weniger als 8 Objekte übrig sind
       if (items.length < 8) {
-        refillMachine(6);
+        refillMachine(7);
         showToast('📦 Neue Preis-Ladung im Automaten eingetroffen!', 'border-indigo-400 text-indigo-200');
       }
 
@@ -1156,14 +1324,54 @@
     // 9. GEWINN-VERARBEITUNG & UI-UPDATES
     // ==========================================
     function collectPrize(item) {
-      state.coins += item.type.value;
+      // Kombo-Multiplikator erhöhen (+0.2x pro Fang in Folge, max 2.5x)
+      state.comboStreak++;
+      state.comboMultiplier = Math.min(2.5, +(1.0 + (state.comboStreak - 1) * 0.2).toFixed(1));
+
+      let baseReward = item.type.value;
+      let bonusText = '';
+
+      // Zufalls-Loot für mysteriöse Quanten-Kapsel
+      if (item.type.special === 'capsule') {
+        const roll = Math.random();
+        if (roll < 0.45) {
+          baseReward += 220;
+          bonusText = ' (Jackpot-Münzen!)';
+        } else if (roll < 0.80) {
+          state.energy = state.maxEnergy;
+          bonusText = ' (+100% Energie!)';
+        } else {
+          // Schaltet sofort ein zufälliges noch fehlendes Sammlungs-Item frei
+          const locked = ITEM_TYPES.filter(t => !state.unlockedItems.has(t.id));
+          if (locked.length > 0) {
+            const gift = locked[Math.floor(Math.random() * locked.length)];
+            state.unlockedItems.add(gift.id);
+            bonusText = ` (Bauplan: ${gift.emoji} ${gift.name}!)`;
+          } else {
+            baseReward += 300;
+            bonusText = ' (Mega-Bonus!)';
+          }
+        }
+      }
+
+      const finalCoins = Math.round(baseReward * state.comboMultiplier);
+      state.coins += finalCoins;
       state.totalCaught++;
-      const isNew = !state.unlockedItems.has(item.type.id);
-      state.unlockedItems.add(item.type.id);
+
+      const isNew = item.type.collectible && !state.unlockedItems.has(item.type.id);
+      if (item.type.collectible) {
+        state.unlockedItems.add(item.type.id);
+      }
 
       audio.playWin();
+      // Tonhöhe steigt leicht mit der Kombo-Serie
+      if (state.comboStreak > 1) {
+        setTimeout(() => audio.playTone(580 + state.comboStreak * 65, 'sine', 0.2, 0.12), 180);
+      }
+
       spawnParticles(CHUTE_WIDTH * 0.5, WORLD_H - 60, '#fbbf24', 24, 4.5);
-      addFloatingText(CHUTE_WIDTH * 0.5, WORLD_H - 95, `+${item.type.value} 🪙`, '#fde047');
+      const comboLabel = state.comboMultiplier > 1 ? ` (x${state.comboMultiplier.toFixed(1)})` : '';
+      addFloatingText(CHUTE_WIDTH * 0.5, WORLD_H - 95, `+${finalCoins} 🪙${comboLabel}`, '#fde047');
 
       // Auswurf-Schacht Schaukasten aktualisieren
       const dropZone = document.getElementById('prize-drop-zone');
@@ -1175,11 +1383,11 @@
             <span>${item.type.name}</span>
             ${isNew ? '<span class="text-[10px] bg-purple-600 text-white px-1.5 py-0.5 rounded uppercase">NEU!</span>' : ''}
           </div>
-          <div class="text-xs font-bold text-amber-300 mt-0.5">+${item.type.value} 🪙 erhalten</div>
+          <div class="text-xs font-bold text-amber-300 mt-0.5">+${finalCoins} 🪙${comboLabel}${bonusText}</div>
         </div>
       `;
 
-      showToast(`🎉 ${item.type.name} gefangen! (+${item.type.value} 🪙)`, 'border-emerald-400 text-emerald-200');
+      showToast(`🎉 ${item.type.name} gefangen! +${finalCoins} 🪙${comboLabel}${bonusText}`, 'border-emerald-400 text-emerald-200');
       renderCollection();
       updateHUD();
     }
@@ -1201,6 +1409,21 @@
       document.getElementById('shop-coin-display').textContent = state.coins;
       document.getElementById('total-caught-badge').textContent = `Gefangen: ${state.totalCaught}`;
       document.getElementById('telemetry-grip-limit').textContent = `Max. Tragkraft: ${getGripLimit()} kg`;
+
+      // Kombo-Anzeige aktualisieren
+      const comboDisp = document.getElementById('combo-display');
+      const comboBadge = document.getElementById('combo-badge');
+      comboDisp.textContent = `x${state.comboMultiplier.toFixed(1)}`;
+      if (state.comboMultiplier >= 2.0) {
+        comboBadge.className = 'bg-amber-950/90 border border-amber-400 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition-all';
+        comboDisp.className = 'pixel-font text-amber-300 text-[11px] sm:text-xs';
+      } else if (state.comboMultiplier > 1.0) {
+        comboBadge.className = 'bg-purple-950/90 border border-purple-400 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner transition-all';
+        comboDisp.className = 'pixel-font text-purple-200 text-[11px] sm:text-xs';
+      } else {
+        comboBadge.className = 'bg-slate-950/90 border border-slate-700 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner transition-all';
+        comboDisp.className = 'pixel-font text-slate-400 text-[11px] sm:text-xs';
+      }
 
       const pct = Math.round((state.energy / state.maxEnergy) * 100);
       const bar = document.getElementById('energy-bar');
@@ -1407,12 +1630,31 @@
           ctx.fillText('M', item.radius * 0.68, -item.radius * 0.68 + 0.5);
         }
 
+        // Gefahren-Warnring um Stör-Minen
+        if (item.type.special === 'hazard') {
+          const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 140);
+          ctx.strokeStyle = `rgba(244, 63, 94, ${0.4 + pulse * 0.6})`;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.arc(0, 0, item.radius + 4, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
         ctx.restore();
       });
 
       // Zeit-Stasis Kälte-Overlay
       if (state.stasisFrames > 0) {
         ctx.fillStyle = 'rgba(139, 92, 246, 0.14)';
+        ctx.fillRect(0, RAIL_Y, WORLD_W, WORLD_H - RAIL_Y);
+      }
+
+      // EMP-Störungs-Overlay (leichtes rotes Flimmern)
+      if (state.empFrames > 0) {
+        const flicker = 0.06 + 0.05 * Math.sin(Date.now() / 60);
+        ctx.fillStyle = `rgba(244, 63, 94, ${flicker})`;
         ctx.fillRect(0, RAIL_Y, WORLD_W, WORLD_H - RAIL_Y);
       }
 
@@ -1684,7 +1926,7 @@
     // Initialisierung nach Laden des Fensters
     window.onload = function () {
       resizeCanvas();
-      refillMachine(12);
+      refillMachine(13);
       renderCollection();
       updateHUD();
       gameLoop();
